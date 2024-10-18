@@ -1,0 +1,43 @@
+import { message } from "../wailsjs/go/models";
+import { INPUT_DIRECTION, INPUT_TYPE } from "./constansts";
+
+export type HitRange = [smallerX: number, largerX: number];
+
+export type Dimension = {
+  x: number;
+  y: number;
+};
+
+export type Character = {
+  imageSet: CharacterImageSet;
+  dimension: Dimension;
+  goalDimension: Dimension;
+  imagePosition: Dimension;
+  counter: number;
+  rewind: boolean;
+  isAttacking: boolean;
+  heading: "left" | "right";
+  userId: string;
+  isProcessing: boolean;
+};
+
+export type Attack = {
+  userId: string;
+  heading: "left" | "right";
+  remainDistance: number;
+  dimension: Dimension;
+  count: number;
+};
+
+export type CharacterImageSet = {
+  idle: HTMLImageElement;
+  attack: HTMLImageElement;
+  walk: HTMLImageElement;
+  climb: HTMLImageElement;
+  hit: HTMLImageElement;
+};
+
+export type CharacterInputs = Map<
+  string,
+  { character: Character; inputs: message.Input[] }
+>;
