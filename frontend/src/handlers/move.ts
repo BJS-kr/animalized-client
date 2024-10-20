@@ -46,6 +46,7 @@ export function handleHorizontalMove(
     }
 
     stayInside(character.dimension);
+    stayInside(character.goalDimension);
   }
 }
 
@@ -77,6 +78,7 @@ export function handleVerticalMove(
       character.imagePosition.x = 0;
     }
     stayInside(character.dimension);
+    stayInside(character.goalDimension);
   }
 }
 
