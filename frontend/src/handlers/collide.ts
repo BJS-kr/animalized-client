@@ -9,6 +9,7 @@ export async function handleCollision(
   hitRange: HitRange
 ) {
   if (
+    attack.userId === character.userId && // 내가 시전한 공격일 경우에만 검증요청 보냄
     attack.count > 0 &&
     character.dimension.y === attack.dimension.y &&
     character.dimension.x >= hitRange[0] &&
@@ -19,8 +20,8 @@ export async function handleCollision(
     input.user_id = attack.userId;
     input.hit_range = hitRange;
     input.hit_user_id = character.userId;
+
     await SendInput(input);
-    attack.remainDistance = 0;
   }
 }
 

@@ -20,7 +20,8 @@ export const INPUT_TYPE = {
   ATTACK: 3,
   HIT: 4,
   SERVER_STATE: 5,
-  DISCONNECTED: 6,
+  JOIN: 6,
+  QUIT: 7,
 };
 export const INPUT_DIRECTION = {
   LEFT: 1,

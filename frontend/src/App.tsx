@@ -1,14 +1,16 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CANVAS_SIZE, CELL_SIZE } from "./constansts";
+import { CANVAS_SIZE, CELL_SIZE, INPUT_TYPE } from "./constansts";
 import type { Character, CharacterInputs } from "./types";
 import { makeCharacter } from "./character/make";
 import { handleInputs } from "./handlers/inputs";
 import { handleKeyDown } from "./handlers/keydown";
 import { makeImageSet } from "./character/image.set";
-import { LogIn } from "../wailsjs/go/main/App";
+import { LogIn, SendInput } from "../wailsjs/go/main/App";
+import { handleJoin } from "./handlers/join";
+import { message } from "../wailsjs/go/models";
 
 export const inputs: CharacterInputs = new Map();
-const characters: Character[] = [];
+export const characters: Character[] = [];
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,23 +46,14 @@ function App() {
   const handleLogin = async () => {
     if (userId) {
       if (await LogIn(userId)) {
-        const pink = makeCharacter(
-          userId,
-          makeImageSet(
-            {
-              walk: "/walk.png",
-              attack: "/attack.png",
-              climb: "/climb.png",
-              idle: "/idle.png",
-              hit: "/hit.png",
-            },
-            "/src/sprites/pink"
-          )
-        );
-        inputs.set(userId, { character: pink, inputs: [] });
-        characters.push(pink);
-        window.addEventListener("keydown", handleKeyDown(pink));
+        const character = handleJoin(userId, characters, inputs);
+        window.addEventListener("keydown", handleKeyDown(character));
         setIsLoggedIn(true);
+
+        const joinInput = new message.Input();
+        joinInput.user_id = userId;
+        joinInput.type = INPUT_TYPE.JOIN;
+        SendInput(joinInput);
       }
     } else {
       alert("이름을 입력해주세요");

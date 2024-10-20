@@ -1,5 +1,4 @@
 import { message } from "../wailsjs/go/models";
-import { INPUT_DIRECTION, INPUT_TYPE } from "./constansts";
 
 export type HitRange = [smallerX: number, largerX: number];
 

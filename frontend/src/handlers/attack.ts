@@ -1,4 +1,4 @@
-import type { Character } from "../types";
+import type { Attack, Character } from "../types";
 import {
   CHARACTER_HEIGHT,
   CHARACTER_WIDTH,
@@ -11,7 +11,7 @@ import {
 export function handleAttack(
   ctx: CanvasRenderingContext2D,
   character: Character
-): Attack {
+): Attack | undefined {
   if (character.heading === "right") {
     ctx.translate(character.dimension.x, character.dimension.y);
     ctx.scale(1, 1);
