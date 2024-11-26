@@ -1,13 +1,10 @@
 package main
 
 import (
-	"animalized/message"
 	"bytes"
 	"errors"
 	"io"
 	"net"
-
-	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -15,13 +12,65 @@ const (
 	INPUT_PACKET_DELIMITER = '$'
 )
 
-func cutChunk(inputBuf *bytes.Buffer) ([]byte, error) {
-	chunk, err := inputBuf.ReadBytes(INPUT_PACKET_DELIMITER)
+type PacketStore struct {
+	incomingBuf []byte
+	inputBuf    *bytes.Buffer
+}
+
+func NewStore() *PacketStore {
+	ps := new(PacketStore)
+	ps.incomingBuf = make([]byte, BUFFER_SIZE)
+	ps.inputBuf = bytes.NewBuffer(nil)
+
+	return ps
+}
+
+func (ps *PacketStore) ParseMessageBytes(conn net.Conn) ([]byte, error) {
+	chunk, err := ps.makeChunk(conn)
+
+	if err != nil {
+		return nil, err
+	}
+
+	stripped, err := stripDelimiter(chunk)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return stripped, nil
+}
+
+func (ps *PacketStore) makeChunk(conn net.Conn) ([]byte, error) {
+	for {
+		chunk, err := ps.cutChunk()
+
+		if err == nil {
+			return chunk, nil
+		}
+
+		if !errors.Is(err, io.EOF) {
+			return chunk, err
+		}
+
+		size, err := ps.readInput(conn)
+
+		if err != nil {
+			return ps.incomingBuf, err
+		}
+
+		if err := ps.writeInput(size); err != nil {
+			return ps.incomingBuf, err
+		}
+	}
+}
+
+func (ps *PacketStore) cutChunk() ([]byte, error) {
+	chunk, err := ps.inputBuf.ReadBytes(INPUT_PACKET_DELIMITER)
 
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			inputBuf.Write(chunk)
-			return chunk, err
+			ps.inputBuf.Write(chunk)
 		}
 
 		return chunk, err
@@ -30,66 +79,8 @@ func cutChunk(inputBuf *bytes.Buffer) ([]byte, error) {
 	return chunk, nil
 }
 
-func into[M proto.Message](target M, stripped *[]byte) error {
-	if err := proto.Unmarshal(*stripped, target); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func makeChunk(conn net.Conn, buf *[]byte, inputBuf *bytes.Buffer) (*[]byte, error) {
-	for {
-
-		size, err := readInput(buf, conn)
-
-		if err != nil {
-			return buf, err
-		}
-
-		if err := writeInput((*buf)[:size], inputBuf); err != nil {
-			return buf, err
-		}
-
-		chunk, err := cutChunk(inputBuf)
-
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				continue
-			}
-
-			return &chunk, err
-		}
-
-		return &chunk, nil
-	}
-}
-
-func ParseInput(conn net.Conn, buf *[]byte, inputBuf *bytes.Buffer) (*message.Input, error) {
-	chunk, err := makeChunk(conn, buf, inputBuf)
-
-	if err != nil {
-		return nil, err
-	}
-
-	err = stripDelimiter(chunk)
-
-	if err != nil {
-		return nil, err
-	}
-
-	input := new(message.Input)
-	err = into(input, chunk)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return input, nil
-}
-
-func readInput(buf *[]byte, conn net.Conn) (int, error) {
-	size, err := conn.Read(*buf)
+func (ps *PacketStore) readInput(conn net.Conn) (int, error) {
+	size, err := conn.Read(ps.incomingBuf)
 
 	if err != nil {
 		if errors.Is(err, io.EOF) {
@@ -107,21 +98,25 @@ func readInput(buf *[]byte, conn net.Conn) (int, error) {
 	return size, nil
 }
 
-func writeInput(incomingBuf []byte, inputBuf *bytes.Buffer) error {
-	if _, err := inputBuf.Write(incomingBuf); err != nil {
+// incomingBuf: ReadIncoming함수에서 buf의 size만큼 slice한 []byte
+// ReadIncoming의 size가 0보다 클 때만 호출
+func (ps *PacketStore) writeInput(size int) error {
+	targetBuf := ps.incomingBuf[:size]
+
+	if _, err := ps.inputBuf.Write(targetBuf); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func stripDelimiter(chunk *[]byte) error {
-	c := *chunk
-	l := len(c)
+func stripDelimiter(chunk []byte) ([]byte, error) {
 
-	if c[l-1] != INPUT_PACKET_DELIMITER {
-		return errors.New("delimiter not on last position")
+	l := len(chunk)
+
+	if chunk[l-1] != INPUT_PACKET_DELIMITER {
+		return chunk, errors.New("delimiter not on last position")
 	}
-	*chunk = c[:l-1]
-	return nil
+
+	return chunk[:l-1], nil
 }

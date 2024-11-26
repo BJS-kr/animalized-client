@@ -2,8 +2,8 @@ package main
 
 import (
 	"animalized/message"
-	"bytes"
 	"context"
+	"fmt"
 	"log/slog"
 	"net"
 
@@ -17,16 +17,6 @@ const SERVER_PORT = 9988
 // App struct
 type App struct {
 	ctx context.Context
-}
-
-type Position struct {
-	X int
-	Y int
-}
-
-type UserState struct {
-	Position *Position
-	Score    int
 }
 
 var conn *net.TCPConn
@@ -44,30 +34,33 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) LogIn(userId string) bool {
 	input := &message.Input{
-		Type:   1,
 		UserId: userId,
+		Kind: &message.Input_Init{
+			Init: &message.Init{},
+		},
 	}
 
-	c, err := a.OpenConnection(input)
+	err := a.OpenConnection(input)
 
 	if err != nil {
 		slog.Error(err.Error())
 		return false
 	}
 
-	conn = c
-
 	return true
 }
 
-func (a *App) SendInput(input *message.Input) error {
-	message, err := proto.Marshal(input)
+func (a *App) SendInput(msg []byte) error {
+	input := new(message.Input)
+	err := proto.Unmarshal(msg, input)
 
 	if err != nil {
 		return err
 	}
 
-	_, err = conn.Write(append(message, '$'))
+	fmt.Println("send input:", input)
+
+	_, err = conn.Write(append(msg, '$'))
 
 	if err != nil {
 		return err
@@ -76,49 +69,57 @@ func (a *App) SendInput(input *message.Input) error {
 	return nil
 }
 
-func (a *App) OpenConnection(initInput *message.Input) (*net.TCPConn, error) {
+func (a *App) OpenConnection(initInput *message.Input) error {
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:9988")
 
 	if err != nil {
-		return nil, err
+		return err
 	}
-	conn, err := net.DialTCP("tcp", nil, addr)
+	c, err := net.DialTCP("tcp", nil, addr)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	message, err := proto.Marshal(initInput)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	_, err = conn.Write(append(message, '$'))
+	_, err = c.Write(append(message, '$'))
 
 	if err != nil {
-		return nil, err
+		return err
 	}
+	conn = c
 
 	go a.ReceiveInput()
 
-	return conn, nil
+	return nil
 }
 
 func (a *App) ReceiveInput() {
-	buf, inputBuf := make([]byte, BUFFER_SIZE), bytes.NewBuffer(nil)
-	for {
-		if conn == nil {
-			continue
-		}
+	ps := NewStore()
+	intSlice := make([]int, 0, BUFFER_SIZE)
 
-		messageInput, err := ParseInput(conn, &buf, inputBuf)
+	for {
+		intSlice = intSlice[:0]
+		msg, err := ps.ParseMessageBytes(conn)
 
 		if err != nil {
 			slog.Error(err.Error())
 			return
 		}
 
-		runtime.EventsEmit(a.ctx, "input", messageInput)
+		// 굳이 int slice로 변환하는 이유
+		// []byte를 그대로 보내면 jsonify할 때 자동으로 base64 인코딩 되어서 가버림(uint8도 마찬가지)..
+		// FE에서 그대로 변환할 수 있게 각 바이트를 전부 int로 변환
+		// FE에서는 받은 number[]를 그대로 Uint8Array로 변환해서 사용
+		for _, b := range msg {
+			intSlice = append(intSlice, int(b))
+		}
+
+		runtime.EventsEmit(a.ctx, "input", intSlice)
 	}
 }

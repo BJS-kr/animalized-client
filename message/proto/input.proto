@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package input;
+
+option go_package = "./message";
+
+message Input {
+  string user_id = 1;
+
+  oneof kind {
+    Init init = 2;
+    Operation op = 3;
+    Lobby lobby = 4;
+    Room room = 5;
+  }
+}
+
+message Position {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Operation {
+  OperationType type = 1;
+  Direction direction = 2;
+  HitRange hit_range = 3;
+  GameState game_state = 4;
+  int64 context = 5;
+  int64 prev_context = 6;
+  
+
+  enum Direction {
+    DIRECTION_UNSPECIFIED = 0;
+    UP = 1;
+    DOWN = 2;
+    LEFT = 3;
+    RIGHT = 4;
+  }
+
+  enum OperationType {
+    OPERATION_UNSPECIFIED = 0;
+    MOVE = 1;
+    ATTACK = 2;
+    HIT = 3;
+    GAME_STATE = 4;
+  }
+
+  message HitRange {
+    Position left_bottom = 1;
+    Position right_top = 2;
+  }
+
+  message GameState {
+    repeated UserState user_states = 1;
+
+    message UserState {
+      Position position = 1;
+      int32 score = 2;
+    }
+  }
+}
+
+message Init {}
+
+message RoomState {
+  RoomStatusType status = 1;
+  string room_name = 2;
+  int32 max_users = 3;
+  repeated string user_ids = 4;
+
+  enum RoomStatusType {
+    ROOM_STATUS_UNSPECIFIED = 0;
+    WAITING = 1;
+    PLAYING = 2;
+  }
+}
+
+message Lobby {
+  LobbyType type = 1;
+  string room_name = 2;
+  int32 max_users = 3;
+  repeated RoomState room_states = 4;
+
+  enum LobbyType {
+    LOBBY_UNSPECIFIED = 0;
+    CREATE_ROOM = 1;
+    JOIN_ROOM = 2;
+    QUIT_ROOM = 3;
+    STATE = 4;
+  }
+}
+
+message Room {
+  RoomType type = 1;
+  string room_name = 2;
+  RoomState room_state = 4;
+
+  enum RoomType {
+    ROOM_UNSPECIFIED = 0;
+    QUIT = 1;
+    START = 2;
+    STATE = 3;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+

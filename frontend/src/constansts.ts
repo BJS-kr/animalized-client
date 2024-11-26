@@ -14,21 +14,33 @@ export const ATTACK_RANGE = 10;
 export const ATTACK_WIDTH = 30;
 export const ATTACK_HEIGHT = 30;
 export const PROJECTILE_SPEED = 9;
-export const INPUT_TYPE = {
-  INIT: 1,
-  MOVE: 2,
-  ATTACK: 3,
-  HIT: 4,
-  SERVER_STATE: 5,
-  JOIN: 6,
-  QUIT: 7,
-};
-export const INPUT_DIRECTION = {
-  LEFT: 1,
-  RIGHT: 2,
-  UP: 3,
-  DOWN: 4,
-};
+
+export const DIRECTION = {
+  UP: 1,
+  DOWN: 2,
+  LEFT: 3,
+  RIGHT: 4,
+} as const;
+
+export const OPERATION_TYPE = {
+  MOVE: 1,
+  ATTACK: 2,
+  HIT: 3,
+  GAME_STATE: 4,
+} as const;
+
+export const LOBBY_TYPE = {
+  CREATE_ROOM: 1,
+  JOIN_ROOM: 2,
+  QUIT_ROOM: 3,
+  STATE: 4,
+} as const;
+
+export const ROOM_TYPE = {
+  QUIT: 1,
+  START: 2,
+  STATE: 3,
+} as const;
 
 if (CELL_SIZE % SPEED !== 0) {
   throw new Error("speed must be divisor of cell size");

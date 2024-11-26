@@ -1,6 +1,10 @@
 import { SendInput } from "../../wailsjs/go/main/App";
-import { message } from "../../wailsjs/go/models";
-import { INPUT_DIRECTION, INPUT_TYPE } from "../constansts";
+import { encode } from "../common/encode";
+
+import { OPERATION_TYPE } from "../constansts";
+import { DIRECTION } from "../constansts";
+import { input as proto } from "../proto/compiled";
+
 import type { Character } from "../types";
 
 export const handleKeyDown =
@@ -11,34 +15,37 @@ export const handleKeyDown =
       return;
     }
 
-    const input = new message.Input();
-    input.user_id = character.userId;
+    const input = new proto.Input();
+    const operation = new proto.Operation();
+    input.userId = character.userId;
+    input.op = operation;
+    input.kind = "op";
 
     switch (event.key) {
       case "ArrowRight":
-        input.type = INPUT_TYPE.MOVE;
-        input.direction = INPUT_DIRECTION.RIGHT;
+        operation.type = OPERATION_TYPE.MOVE;
+        operation.direction = DIRECTION.RIGHT;
         break;
       case "ArrowLeft":
-        input.type = INPUT_TYPE.MOVE;
-        input.direction = INPUT_DIRECTION.LEFT;
+        operation.type = OPERATION_TYPE.MOVE;
+        operation.direction = DIRECTION.LEFT;
         break;
       case "ArrowUp":
-        input.type = INPUT_TYPE.MOVE;
-        input.direction = INPUT_DIRECTION.UP;
+        operation.type = OPERATION_TYPE.MOVE;
+        operation.direction = DIRECTION.UP;
         break;
       case "ArrowDown":
-        input.type = INPUT_TYPE.MOVE;
-        input.direction = INPUT_DIRECTION.DOWN;
+        operation.type = OPERATION_TYPE.MOVE;
+        operation.direction = DIRECTION.DOWN;
         break;
       case "a":
       case "A":
       case "ㅁ":
-        input.type = INPUT_TYPE.ATTACK;
+        operation.type = OPERATION_TYPE.ATTACK;
         break;
       default:
         console.warn("unhandled key: ", event.key);
     }
 
-    await SendInput(input);
+    await SendInput(encode(input));
   };

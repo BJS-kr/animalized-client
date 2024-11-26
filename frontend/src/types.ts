@@ -1,4 +1,4 @@
-import { message } from "../wailsjs/go/models";
+import { input } from "./proto/compiled";
 
 export type HitRange = [smallerX: number, largerX: number];
 
@@ -38,5 +38,5 @@ export type CharacterImageSet = {
 
 export type CharacterInputs = Map<
   string,
-  { character: Character; inputs: message.Input[] }
+  { character: Character; inputs: input.Input[] }
 >;

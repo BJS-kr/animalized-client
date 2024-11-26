@@ -1,6 +1,8 @@
 import { SendInput } from "../../wailsjs/go/main/App";
 import { message } from "../../wailsjs/go/models";
-import { ATTACK_WIDTH, INPUT_TYPE, PROJECTILE_SPEED } from "../constansts";
+import { encode } from "../common/encode";
+import { ATTACK_WIDTH, PROJECTILE_SPEED } from "../constansts";
+import proto from "../proto";
 import { Attack, Character, HitRange } from "../types";
 
 export async function handleCollision(
@@ -15,13 +17,13 @@ export async function handleCollision(
     character.dimension.x >= hitRange[0] &&
     character.dimension.x <= hitRange[1]
   ) {
-    const input = new message.Input();
-    input.type = INPUT_TYPE.HIT;
-    input.user_id = attack.userId;
-    input.hit_range = hitRange;
-    input.hit_user_id = character.userId;
+    const input = new proto.Input();
+    // input.type = INPUT_TYPE.HIT;
+    // input.user_id = attack.userId;
+    // input.hit_range = hitRange;
+    // input.hit_user_id = character.userId;
 
-    await SendInput(input);
+    await SendInput(encode(input));
   }
 }
 
