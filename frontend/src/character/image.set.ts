@@ -1,4 +1,4 @@
-const BASE_PATH = "/src/sprites/";
+const BASE_PATH = "/sprites/";
 
 export function makeImageSet(characterName: "pink" | "owlet" | "dude") {
   const walkImage = new Image();
