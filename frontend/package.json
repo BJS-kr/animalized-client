@@ -10,6 +10,7 @@
     "generate:types": "npx pbjs -t static-module -w es6 -o src/proto/compiled.js ../message/proto/input.proto && npx pbts -o src/proto/compiled.d.ts src/proto/compiled.js"
   },
   "dependencies": {
+    "base64-js": "^1.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

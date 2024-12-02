@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { LOBBY_TYPE } from "./constansts";
 import proto from "./proto";
 import { SendInput } from "../wailsjs/go/main/App";
 import { encode } from "./common/encode";
@@ -7,7 +6,7 @@ import { encode } from "./common/encode";
 export const handleJoinRoom = (roomName: string, userId: string) => {
   const joinRoomInput = new proto.Input();
   const lobby = new proto.Lobby();
-  lobby.type = LOBBY_TYPE.JOIN_ROOM;
+  lobby.type = proto.Lobby.LobbyType.JOIN_ROOM;
   lobby.roomName = roomName;
   joinRoomInput.kind = "lobby";
   joinRoomInput.lobby = lobby;
@@ -36,7 +35,7 @@ export const Lobby: React.FC<{
 
     const createRoomInput = new proto.Input();
     const lobby = new proto.Lobby();
-    lobby.type = LOBBY_TYPE.CREATE_ROOM;
+    lobby.type = proto.Lobby.LobbyType.CREATE_ROOM;
     lobby.roomName = roomName;
     lobby.maxUsers = maxUsers;
     createRoomInput.userId = userId;
@@ -115,9 +114,9 @@ export const Lobby: React.FC<{
         </div>
       </div>
 
-      {lobbyStatus?.roomStates?.map((roomStatus) => (
+      {lobbyStatus?.roomStates?.map((roomState) => (
         <div
-          key={roomStatus.roomName}
+          key={roomState.roomName}
           style={{
             border: "1px solid #ccc",
             borderRadius: "8px",
@@ -130,14 +129,19 @@ export const Lobby: React.FC<{
           }}
         >
           <div>
-            <strong>{roomStatus.roomName}</strong>
+            <strong>{roomState.roomName}</strong>
             <span style={{ marginLeft: "8px" }}>
-              {roomStatus.userIds?.length ?? 0}/
-              {roomStatus.maxUsers ?? "invalid"}
+              {roomState.userIds?.length ?? 0}/{roomState.maxUsers ?? "invalid"}
+              {roomState.status ===
+              proto.RoomState.RoomStatusType.ROOM_STATUS_UNSPECIFIED
+                ? "invalid"
+                : roomState.status === proto.RoomState.RoomStatusType.WAITING
+                ? "waiting"
+                : "playing"}
             </span>
           </div>
           <button
-            onClick={() => handleJoinRoom(roomStatus.roomName ?? "", userId)}
+            onClick={() => handleJoinRoom(roomState.roomName ?? "", userId)}
             style={{
               padding: "8px 16px",
               backgroundColor: "#4CAF50",

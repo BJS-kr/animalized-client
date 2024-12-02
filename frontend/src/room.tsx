@@ -1,5 +1,4 @@
 import React from "react";
-import { ROOM_TYPE } from "./constansts";
 import proto from "./proto";
 import { SendInput } from "../wailsjs/go/main/App";
 import { encode } from "./common/encode";
@@ -23,11 +22,24 @@ export const Room: React.FC<RoomProps> = ({
 
     quitRoomInput.userId = userId;
     quitRoomInput.kind = "room";
-    room.type = ROOM_TYPE.QUIT;
+    room.type = proto.Room.RoomType.QUIT;
     room.roomName = roomName;
     quitRoomInput.room = room;
 
     SendInput(encode(quitRoomInput));
+  };
+
+  const handleStart = () => {
+    const startInput = new proto.Input();
+    const room = new proto.Room();
+
+    room.roomName = roomName;
+    startInput.userId = userId;
+    startInput.kind = "room";
+    room.type = proto.Room.RoomType.START;
+    startInput.room = room;
+
+    SendInput(encode(startInput));
   };
 
   return (
@@ -39,6 +51,7 @@ export const Room: React.FC<RoomProps> = ({
       <div>
         current: {userNames.length} / {maxUsers}
       </div>
+      <button onClick={handleStart}>Start</button>
       <button onClick={handleQuitRoom}>Quit</button>
     </div>
   );

@@ -19,7 +19,8 @@ export function handleInputs(
   inputs: CharacterInputs,
   characters: Character[],
   attacks: Attack[],
-  projectileImage: HTMLImageElement
+  projectileImage: HTMLImageElement,
+  userId: string
 ) {
   ctx.clearRect(0, 0, canvasSize, canvasSize);
 
@@ -28,7 +29,7 @@ export function handleInputs(
   ctx.fillRect(0, 0, canvasSize, canvasSize);
   ctx.restore();
 
-  handleProjectiles(ctx, attacks, projectileImage, characters);
+  handleProjectiles(ctx, attacks, projectileImage, characters, userId);
 
   for (const character of characters) {
     applyNextInput(inputs, character);
@@ -47,10 +48,21 @@ export function handleInputs(
         handleIdleAnimation(ctx, character);
       }
     });
+
+    if (character.userId === userId) {
+      handleVisibleRange(ctx, character);
+    }
   }
-  handleVisibleRange(ctx, characters[0]);
 
   requestAnimationFrame(() =>
-    handleInputs(ctx, canvasSize, inputs, characters, attacks, projectileImage)
+    handleInputs(
+      ctx,
+      canvasSize,
+      inputs,
+      characters,
+      attacks,
+      projectileImage,
+      userId
+    )
   );
 }

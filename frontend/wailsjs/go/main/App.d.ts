@@ -8,4 +8,4 @@ export function OpenConnection(arg1:message.Input):Promise<void>;
 
 export function ReceiveInput():Promise<void>;
 
-export function SendInput(arg1:Array<number>):Promise<void>;
+export function SendInput(arg1:string):Promise<void>;

@@ -3,6 +3,7 @@ package main
 import (
 	"animalized/message"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log/slog"
 	"net"
@@ -50,19 +51,28 @@ func (a *App) LogIn(userId string) bool {
 	return true
 }
 
-func (a *App) SendInput(msg []byte) error {
+func (a *App) SendInput(msg string) error {
+	decoded, err := base64.StdEncoding.DecodeString(msg)
+
+	if err != nil {
+		return err
+	}
+
 	input := new(message.Input)
-	err := proto.Unmarshal(msg, input)
+	err = proto.Unmarshal(decoded, input)
 
 	if err != nil {
 		return err
 	}
 
 	fmt.Println("send input:", input)
-
-	_, err = conn.Write(append(msg, '$'))
+	fmt.Println("decoded: ", decoded)
+	data := append(decoded, INPUT_PACKET_DELIMITER)
+	fmt.Println("chunk: ", data)
+	_, err = conn.Write(data)
 
 	if err != nil {
+		slog.Error(err.Error())
 		return err
 	}
 
@@ -87,7 +97,7 @@ func (a *App) OpenConnection(initInput *message.Input) error {
 		return err
 	}
 
-	_, err = c.Write(append(message, '$'))
+	_, err = c.Write(append(message, INPUT_PACKET_DELIMITER))
 
 	if err != nil {
 		return err
@@ -101,10 +111,8 @@ func (a *App) OpenConnection(initInput *message.Input) error {
 
 func (a *App) ReceiveInput() {
 	ps := NewStore()
-	intSlice := make([]int, 0, BUFFER_SIZE)
 
 	for {
-		intSlice = intSlice[:0]
 		msg, err := ps.ParseMessageBytes(conn)
 
 		if err != nil {
@@ -112,14 +120,6 @@ func (a *App) ReceiveInput() {
 			return
 		}
 
-		// 굳이 int slice로 변환하는 이유
-		// []byte를 그대로 보내면 jsonify할 때 자동으로 base64 인코딩 되어서 가버림(uint8도 마찬가지)..
-		// FE에서 그대로 변환할 수 있게 각 바이트를 전부 int로 변환
-		// FE에서는 받은 number[]를 그대로 Uint8Array로 변환해서 사용
-		for _, b := range msg {
-			intSlice = append(intSlice, int(b))
-		}
-
-		runtime.EventsEmit(a.ctx, "input", intSlice)
+		runtime.EventsEmit(a.ctx, "input", msg)
 	}
 }

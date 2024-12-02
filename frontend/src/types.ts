@@ -1,4 +1,4 @@
-import { input } from "./proto/compiled";
+import proto from "./proto";
 
 export type HitRange = [smallerX: number, largerX: number];
 
@@ -21,6 +21,7 @@ export type Character = {
 };
 
 export type Attack = {
+  id: number;
   userId: string;
   heading: "left" | "right";
   remainDistance: number;
@@ -38,5 +39,5 @@ export type CharacterImageSet = {
 
 export type CharacterInputs = Map<
   string,
-  { character: Character; inputs: input.Input[] }
+  { character: Character; inputs: proto.Input[] }
 >;

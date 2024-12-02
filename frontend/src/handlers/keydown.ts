@@ -1,8 +1,5 @@
 import { SendInput } from "../../wailsjs/go/main/App";
 import { encode } from "../common/encode";
-
-import { OPERATION_TYPE } from "../constansts";
-import { DIRECTION } from "../constansts";
 import { input as proto } from "../proto/compiled";
 
 import type { Character } from "../types";
@@ -23,25 +20,25 @@ export const handleKeyDown =
 
     switch (event.key) {
       case "ArrowRight":
-        operation.type = OPERATION_TYPE.MOVE;
-        operation.direction = DIRECTION.RIGHT;
+        operation.type = proto.Operation.OperationType.MOVE;
+        operation.direction = proto.Operation.Direction.RIGHT;
         break;
       case "ArrowLeft":
-        operation.type = OPERATION_TYPE.MOVE;
-        operation.direction = DIRECTION.LEFT;
+        operation.type = proto.Operation.OperationType.MOVE;
+        operation.direction = proto.Operation.Direction.LEFT;
         break;
       case "ArrowUp":
-        operation.type = OPERATION_TYPE.MOVE;
-        operation.direction = DIRECTION.UP;
+        operation.type = proto.Operation.OperationType.MOVE;
+        operation.direction = proto.Operation.Direction.UP;
         break;
       case "ArrowDown":
-        operation.type = OPERATION_TYPE.MOVE;
-        operation.direction = DIRECTION.DOWN;
+        operation.type = proto.Operation.OperationType.MOVE;
+        operation.direction = proto.Operation.Direction.DOWN;
         break;
       case "a":
       case "A":
       case "ㅁ":
-        operation.type = OPERATION_TYPE.ATTACK;
+        operation.type = proto.Operation.OperationType.ATTACK;
         break;
       default:
         console.warn("unhandled key: ", event.key);

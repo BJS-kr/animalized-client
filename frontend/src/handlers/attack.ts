@@ -8,10 +8,12 @@ import {
   ATTACK_RANGE,
 } from "../constansts";
 
+let attackId = 0;
+
 export function handleAttack(
   ctx: CanvasRenderingContext2D,
   character: Character
-): Attack | undefined {
+): Attack | null {
   if (character.heading === "right") {
     ctx.translate(character.dimension.x, character.dimension.y);
     ctx.scale(1, 1);
@@ -48,6 +50,7 @@ export function handleAttack(
     character.isAttacking = false;
 
     return {
+      id: attackId++,
       dimension: { x: character.dimension.x, y: character.dimension.y },
       heading: character.heading,
       remainDistance: CELL_SIZE * ATTACK_RANGE,
@@ -55,4 +58,6 @@ export function handleAttack(
       userId: character.userId,
     };
   }
+
+  return null;
 }

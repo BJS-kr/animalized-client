@@ -1,19 +1,20 @@
 import { ATTACK_WIDTH, PROJECTILE_SPEED } from "../constansts";
 import { stayInside } from "../helper/stay";
 import type { Attack, Character, HitRange } from "../types";
-import { determineHitRange, handleCollision } from "./collide";
+import { handleCollision } from "./collide";
 
 export function handleProjectiles(
   ctx: CanvasRenderingContext2D,
   attacks: Attack[],
   projectileImage: HTMLImageElement,
-  characters: Character[]
+  characters: Character[],
+  userId: string
 ) {
   for (const attack of attacks) {
     if (attack.remainDistance <= 0) {
       continue;
     }
-    handleProjectile(ctx, attack, projectileImage, characters);
+    handleProjectile(ctx, attack, projectileImage, characters, userId);
   }
 
   attacks = attacks.filter((attack) => attack.remainDistance > 0);
@@ -23,7 +24,8 @@ export function handleProjectile(
   ctx: CanvasRenderingContext2D,
   attack: Attack,
   projectileImage: HTMLImageElement,
-  characters: Character[]
+  characters: Character[],
+  userId: string
 ) {
   ctx.save();
 
@@ -33,9 +35,8 @@ export function handleProjectile(
   forwardProjectile(attack);
   drawProjectile(ctx, attack, projectileImage);
 
-  const hitRange = determineHitRange(attack);
   for (const character of characters) {
-    handleCollision(attack, character, hitRange);
+    attack.userId === userId && handleCollision(attack, character);
   }
   attack.count++;
 
