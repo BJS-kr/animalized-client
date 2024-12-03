@@ -12,6 +12,7 @@ import { handleCharacterNameText } from "./name";
 import { handleProjectiles } from "./projectile";
 import { handleVisibleRange } from "./vision";
 import type { Character, Attack, CharacterInputs } from "../types";
+import { handleHitAnimation } from "./hit";
 
 export function handleInputs(
   ctx: CanvasRenderingContext2D,
@@ -32,7 +33,7 @@ export function handleInputs(
   handleProjectiles(ctx, attacks, projectileImage, characters, userId);
 
   for (const character of characters) {
-    applyNextInput(inputs, character);
+    applyNextInput(inputs, character, attacks);
 
     wrapContext(ctx, () => {
       handleCharacterNameText(ctx, character);
@@ -44,6 +45,8 @@ export function handleInputs(
       } else if (character.isAttacking) {
         const attack = handleAttack(ctx, character);
         attack && attacks.push({ ...attack, userId: character.userId });
+      } else if (character.isHit) {
+        handleHitAnimation(ctx, character);
       } else {
         handleIdleAnimation(ctx, character);
       }

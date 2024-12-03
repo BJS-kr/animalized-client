@@ -18,6 +18,7 @@ export function makeCharacter(
     imagePosition: { x: 0, y: 0 },
     counter: 0,
     isAttacking: false,
+    isHit: false,
     rewind: false,
     heading: "right",
   };

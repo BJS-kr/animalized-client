@@ -7,6 +7,7 @@ export const WALK_FRAME_COUNT = 4 as const;
 export const CLIMB_FRAME_COUNT = 3 as const;
 export const ATTACK_FRAME_COUNT = 3 as const;
 export const IDLE_FRAME_COUNT = 3 as const;
+export const HIT_FRAME_COUNT = 3 as const;
 export const MAP_SIZE = 20 as const;
 export const VISUAL_RANGE = 7 as const;
 export const ATTACK_RANGE = 12 as const;

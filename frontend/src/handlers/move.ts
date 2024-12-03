@@ -48,6 +48,8 @@ export function handleHorizontalMove(
     stayInside(character.dimension);
     stayInside(character.goalDimension);
   }
+
+  console.log(character.dimension);
 }
 
 export function handleVerticalMove(
@@ -80,6 +82,8 @@ export function handleVerticalMove(
     stayInside(character.dimension);
     stayInside(character.goalDimension);
   }
+
+  console.log(character.dimension);
 }
 
 export function isHorizontallyDifferent(character: Character): boolean {

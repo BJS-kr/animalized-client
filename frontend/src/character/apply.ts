@@ -1,9 +1,13 @@
 import { message } from "../../wailsjs/go/models";
 import { CELL_SIZE } from "../constansts";
 import proto from "../proto";
-import type { Character, CharacterInputs } from "../types";
+import type { Attack, Character, CharacterInputs } from "../types";
 
-export function applyNextInput(inputs: CharacterInputs, character: Character) {
+export function applyNextInput(
+  inputs: CharacterInputs,
+  character: Character,
+  attacks: Attack[]
+) {
   if (!character.isProcessing) {
     const characterInput = inputs.get(character.userId)?.inputs.shift();
 
@@ -42,6 +46,17 @@ export function applyNextInput(inputs: CharacterInputs, character: Character) {
       characterInput.op.type === proto.Operation.OperationType.ATTACK
     ) {
       character.isAttacking = true;
+    } else if (characterInput.op.type === proto.Operation.OperationType.HIT) {
+      const targetAttack = attacks.find(
+        (attack) =>
+          attack.id === characterInput?.op?.projectileId &&
+          attack.remainDistance > 0
+      );
+      if (!targetAttack) {
+        return;
+      }
+      targetAttack.remainDistance = 0;
+      character.isHit = true;
     }
   }
 }

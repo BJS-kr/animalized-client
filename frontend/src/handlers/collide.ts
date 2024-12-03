@@ -30,6 +30,8 @@ export async function handleCollision(attack: Attack, character: Character) {
         y: attack.dimension.y,
       }),
     });
+    operation.targetUserId = character.userId;
+    operation.projectileId = attack.id;
 
     await SendInput(encode(input));
   }

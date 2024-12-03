@@ -1,17 +1,16 @@
-import type { Character } from "../types";
 import {
   CHARACTER_HEIGHT,
   CHARACTER_WIDTH,
+  HIT_FRAME_COUNT,
   STAGGER_FRAME,
-  IDLE_FRAME_COUNT,
 } from "../constansts";
+import { Character } from "../types";
 
-export function handleIdleAnimation(
+export function handleHitAnimation(
   ctx: CanvasRenderingContext2D,
   character: Character
 ) {
-  character.isProcessing = false;
-  if (character.imagePosition.x > IDLE_FRAME_COUNT) {
+  if (character.imagePosition.x > HIT_FRAME_COUNT) {
     character.imagePosition.x = 0;
   }
 
@@ -29,7 +28,7 @@ export function handleIdleAnimation(
   }
 
   ctx.drawImage(
-    character.imageSet.idle,
+    character.imageSet.hit,
     character.imagePosition.x * CHARACTER_WIDTH,
     character.imagePosition.y * CHARACTER_HEIGHT,
     CHARACTER_WIDTH,
@@ -42,17 +41,10 @@ export function handleIdleAnimation(
 
   character.counter++;
   if (!(character.counter % STAGGER_FRAME)) {
-    if (!character.rewind) {
-      character.imagePosition.x++;
-    } else {
-      character.imagePosition.x--;
-    }
-    character.counter = 0;
+    character.imagePosition.x++;
+  }
 
-    if (character.imagePosition.x >= IDLE_FRAME_COUNT) {
-      character.rewind = true;
-    } else if (character.imagePosition.x <= 0) {
-      character.rewind = false;
-    }
+  if (character.imagePosition.x >= HIT_FRAME_COUNT) {
+    character.isHit = false;
   }
 }

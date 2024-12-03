@@ -11,6 +11,7 @@ import proto from "./proto";
 import { handleJoin } from "./handlers/join";
 import { handleKeyDown } from "./handlers/keydown";
 import { toByteArray } from "base64-js";
+import { input } from "./proto/compiled";
 
 export const inputs: CharacterInputs = new Map();
 export const characters: Character[] = [];
@@ -27,7 +28,7 @@ function App() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const fireball = new Image();
 
-  fireball.src = "/src/sprites/fireball/fireball.png";
+  fireball.src = "/sprites/fireball/fireball.png";
   fireball.width = 30;
   fireball.height = 20;
 
@@ -138,12 +139,15 @@ function App() {
       case "op":
         switch (decodedInput.op!.type) {
           case proto.Operation.OperationType.MOVE:
-            console.log("move input", decodedInput);
             inputs.get(decodedInput.userId)!.inputs.push(decodedInput);
             break;
           case proto.Operation.OperationType.ATTACK:
-            console.log("attack input", decodedInput);
             inputs.get(decodedInput.userId)!.inputs.push(decodedInput);
+            break;
+          case proto.Operation.OperationType.HIT:
+            inputs
+              .get(decodedInput.op!.targetUserId!)!
+              .inputs.push(decodedInput);
             break;
         }
         break;

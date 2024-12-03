@@ -15,6 +15,7 @@ export type Character = {
   counter: number;
   rewind: boolean;
   isAttacking: boolean;
+  isHit: boolean;
   heading: "left" | "right";
   userId: string;
   isProcessing: boolean;

@@ -242,11 +242,14 @@ export namespace input {
         /** Operation hitRange */
         hitRange?: (input.Operation.IHitRange|null);
 
+        /** Operation gameState */
+        gameState?: (input.Operation.IGameState|null);
+
         /** Operation targetUserId */
         targetUserId?: (string|null);
 
-        /** Operation gameState */
-        gameState?: (input.Operation.IGameState|null);
+        /** Operation projectileId */
+        projectileId?: (number|null);
 
         /** Operation context */
         context?: (number|Long|null);
@@ -273,11 +276,14 @@ export namespace input {
         /** Operation hitRange. */
         public hitRange?: (input.Operation.IHitRange|null);
 
+        /** Operation gameState. */
+        public gameState?: (input.Operation.IGameState|null);
+
         /** Operation targetUserId. */
         public targetUserId: string;
 
-        /** Operation gameState. */
-        public gameState?: (input.Operation.IGameState|null);
+        /** Operation projectileId. */
+        public projectileId: number;
 
         /** Operation context. */
         public context: (number|Long);
