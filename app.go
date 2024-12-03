@@ -66,10 +66,8 @@ func (a *App) SendInput(msg string) error {
 	}
 
 	fmt.Println("send input:", input)
-	fmt.Println("decoded: ", decoded)
-	data := append(decoded, INPUT_PACKET_DELIMITER)
-	fmt.Println("chunk: ", data)
-	_, err = conn.Write(data)
+
+	_, err = conn.Write(append(decoded, INPUT_PACKET_DELIMITER))
 
 	if err != nil {
 		slog.Error(err.Error())
