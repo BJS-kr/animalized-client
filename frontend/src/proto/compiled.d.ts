@@ -242,6 +242,9 @@ export namespace input {
         /** Operation hitRange */
         hitRange?: (input.Operation.IHitRange|null);
 
+        /** Operation targetUserId */
+        targetUserId?: (string|null);
+
         /** Operation gameState */
         gameState?: (input.Operation.IGameState|null);
 
@@ -269,6 +272,9 @@ export namespace input {
 
         /** Operation hitRange. */
         public hitRange?: (input.Operation.IHitRange|null);
+
+        /** Operation targetUserId. */
+        public targetUserId: string;
 
         /** Operation gameState. */
         public gameState?: (input.Operation.IGameState|null);

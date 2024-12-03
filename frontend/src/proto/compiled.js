@@ -608,6 +608,7 @@ export const input = $root.input = (() => {
          * @property {input.Operation.OperationType|null} [type] Operation type
          * @property {input.Operation.Direction|null} [direction] Operation direction
          * @property {input.Operation.IHitRange|null} [hitRange] Operation hitRange
+         * @property {string|null} [targetUserId] Operation targetUserId
          * @property {input.Operation.IGameState|null} [gameState] Operation gameState
          * @property {number|Long|null} [context] Operation context
          * @property {number|Long|null} [prevContext] Operation prevContext
@@ -651,6 +652,14 @@ export const input = $root.input = (() => {
          * @instance
          */
         Operation.prototype.hitRange = null;
+
+        /**
+         * Operation targetUserId.
+         * @member {string} targetUserId
+         * @memberof input.Operation
+         * @instance
+         */
+        Operation.prototype.targetUserId = "";
 
         /**
          * Operation gameState.
@@ -706,12 +715,14 @@ export const input = $root.input = (() => {
                 writer.uint32(/* id 2, wireType 0 =*/16).int32(message.direction);
             if (message.hitRange != null && Object.hasOwnProperty.call(message, "hitRange"))
                 $root.input.Operation.HitRange.encode(message.hitRange, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            if (message.targetUserId != null && Object.hasOwnProperty.call(message, "targetUserId"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.targetUserId);
             if (message.gameState != null && Object.hasOwnProperty.call(message, "gameState"))
-                $root.input.Operation.GameState.encode(message.gameState, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                $root.input.Operation.GameState.encode(message.gameState, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
             if (message.context != null && Object.hasOwnProperty.call(message, "context"))
-                writer.uint32(/* id 5, wireType 0 =*/40).int64(message.context);
+                writer.uint32(/* id 6, wireType 0 =*/48).int64(message.context);
             if (message.prevContext != null && Object.hasOwnProperty.call(message, "prevContext"))
-                writer.uint32(/* id 6, wireType 0 =*/48).int64(message.prevContext);
+                writer.uint32(/* id 7, wireType 0 =*/56).int64(message.prevContext);
             return writer;
         };
 
@@ -759,14 +770,18 @@ export const input = $root.input = (() => {
                         break;
                     }
                 case 4: {
-                        message.gameState = $root.input.Operation.GameState.decode(reader, reader.uint32());
+                        message.targetUserId = reader.string();
                         break;
                     }
                 case 5: {
-                        message.context = reader.int64();
+                        message.gameState = $root.input.Operation.GameState.decode(reader, reader.uint32());
                         break;
                     }
                 case 6: {
+                        message.context = reader.int64();
+                        break;
+                    }
+                case 7: {
                         message.prevContext = reader.int64();
                         break;
                     }
@@ -832,6 +847,9 @@ export const input = $root.input = (() => {
                 if (error)
                     return "hitRange." + error;
             }
+            if (message.targetUserId != null && message.hasOwnProperty("targetUserId"))
+                if (!$util.isString(message.targetUserId))
+                    return "targetUserId: string expected";
             if (message.gameState != null && message.hasOwnProperty("gameState")) {
                 let error = $root.input.Operation.GameState.verify(message.gameState);
                 if (error)
@@ -919,6 +937,8 @@ export const input = $root.input = (() => {
                     throw TypeError(".input.Operation.hitRange: object expected");
                 message.hitRange = $root.input.Operation.HitRange.fromObject(object.hitRange);
             }
+            if (object.targetUserId != null)
+                message.targetUserId = String(object.targetUserId);
             if (object.gameState != null) {
                 if (typeof object.gameState !== "object")
                     throw TypeError(".input.Operation.gameState: object expected");
@@ -962,6 +982,7 @@ export const input = $root.input = (() => {
                 object.type = options.enums === String ? "OPERATION_UNSPECIFIED" : 0;
                 object.direction = options.enums === String ? "DIRECTION_UNSPECIFIED" : 0;
                 object.hitRange = null;
+                object.targetUserId = "";
                 object.gameState = null;
                 if ($util.Long) {
                     let long = new $util.Long(0, 0, false);
@@ -980,6 +1001,8 @@ export const input = $root.input = (() => {
                 object.direction = options.enums === String ? $root.input.Operation.Direction[message.direction] === undefined ? message.direction : $root.input.Operation.Direction[message.direction] : message.direction;
             if (message.hitRange != null && message.hasOwnProperty("hitRange"))
                 object.hitRange = $root.input.Operation.HitRange.toObject(message.hitRange, options);
+            if (message.targetUserId != null && message.hasOwnProperty("targetUserId"))
+                object.targetUserId = message.targetUserId;
             if (message.gameState != null && message.hasOwnProperty("gameState"))
                 object.gameState = $root.input.Operation.GameState.toObject(message.gameState, options);
             if (message.context != null && message.hasOwnProperty("context"))
