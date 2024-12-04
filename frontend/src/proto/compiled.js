@@ -2666,6 +2666,7 @@ export const input = $root.input = (() => {
          * @property {input.Room.RoomType|null} [type] Room type
          * @property {string|null} [roomName] Room roomName
          * @property {input.IRoomState|null} [roomState] Room roomState
+         * @property {Object.<string,input.Room.CharacterType>|null} [userCharacterTypes] Room userCharacterTypes
          */
 
         /**
@@ -2677,6 +2678,7 @@ export const input = $root.input = (() => {
          * @param {input.IRoom=} [properties] Properties to set
          */
         function Room(properties) {
+            this.userCharacterTypes = {};
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -2708,6 +2710,14 @@ export const input = $root.input = (() => {
         Room.prototype.roomState = null;
 
         /**
+         * Room userCharacterTypes.
+         * @member {Object.<string,input.Room.CharacterType>} userCharacterTypes
+         * @memberof input.Room
+         * @instance
+         */
+        Room.prototype.userCharacterTypes = $util.emptyObject;
+
+        /**
          * Creates a new Room instance using the specified properties.
          * @function create
          * @memberof input.Room
@@ -2737,6 +2747,9 @@ export const input = $root.input = (() => {
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.roomName);
             if (message.roomState != null && Object.hasOwnProperty.call(message, "roomState"))
                 $root.input.RoomState.encode(message.roomState, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            if (message.userCharacterTypes != null && Object.hasOwnProperty.call(message, "userCharacterTypes"))
+                for (let keys = Object.keys(message.userCharacterTypes), i = 0; i < keys.length; ++i)
+                    writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.userCharacterTypes[keys[i]]).ldelim();
             return writer;
         };
 
@@ -2767,7 +2780,7 @@ export const input = $root.input = (() => {
         Room.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.input.Room();
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.input.Room(), key, value;
             while (reader.pos < end) {
                 let tag = reader.uint32();
                 switch (tag >>> 3) {
@@ -2781,6 +2794,29 @@ export const input = $root.input = (() => {
                     }
                 case 4: {
                         message.roomState = $root.input.RoomState.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 5: {
+                        if (message.userCharacterTypes === $util.emptyObject)
+                            message.userCharacterTypes = {};
+                        let end2 = reader.uint32() + reader.pos;
+                        key = "";
+                        value = 0;
+                        while (reader.pos < end2) {
+                            let tag2 = reader.uint32();
+                            switch (tag2 >>> 3) {
+                            case 1:
+                                key = reader.string();
+                                break;
+                            case 2:
+                                value = reader.int32();
+                                break;
+                            default:
+                                reader.skipType(tag2 & 7);
+                                break;
+                            }
+                        }
+                        message.userCharacterTypes[key] = value;
                         break;
                     }
                 default:
@@ -2836,6 +2872,21 @@ export const input = $root.input = (() => {
                 if (error)
                     return "roomState." + error;
             }
+            if (message.userCharacterTypes != null && message.hasOwnProperty("userCharacterTypes")) {
+                if (!$util.isObject(message.userCharacterTypes))
+                    return "userCharacterTypes: object expected";
+                let key = Object.keys(message.userCharacterTypes);
+                for (let i = 0; i < key.length; ++i)
+                    switch (message.userCharacterTypes[key[i]]) {
+                    default:
+                        return "userCharacterTypes: enum value{k:string} expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                        break;
+                    }
+            }
             return null;
         };
 
@@ -2882,6 +2933,36 @@ export const input = $root.input = (() => {
                     throw TypeError(".input.Room.roomState: object expected");
                 message.roomState = $root.input.RoomState.fromObject(object.roomState);
             }
+            if (object.userCharacterTypes) {
+                if (typeof object.userCharacterTypes !== "object")
+                    throw TypeError(".input.Room.userCharacterTypes: object expected");
+                message.userCharacterTypes = {};
+                for (let keys = Object.keys(object.userCharacterTypes), i = 0; i < keys.length; ++i)
+                    switch (object.userCharacterTypes[keys[i]]) {
+                    default:
+                        if (typeof object.userCharacterTypes[keys[i]] === "number") {
+                            message.userCharacterTypes[keys[i]] = object.userCharacterTypes[keys[i]];
+                            break;
+                        }
+                        break;
+                    case "CHARACTER_UNSPECIFIED":
+                    case 0:
+                        message.userCharacterTypes[keys[i]] = 0;
+                        break;
+                    case "PINK":
+                    case 1:
+                        message.userCharacterTypes[keys[i]] = 1;
+                        break;
+                    case "DUDE":
+                    case 2:
+                        message.userCharacterTypes[keys[i]] = 2;
+                        break;
+                    case "OWL":
+                    case 3:
+                        message.userCharacterTypes[keys[i]] = 3;
+                        break;
+                    }
+            }
             return message;
         };
 
@@ -2898,6 +2979,8 @@ export const input = $root.input = (() => {
             if (!options)
                 options = {};
             let object = {};
+            if (options.objects || options.defaults)
+                object.userCharacterTypes = {};
             if (options.defaults) {
                 object.type = options.enums === String ? "ROOM_UNSPECIFIED" : 0;
                 object.roomName = "";
@@ -2909,6 +2992,12 @@ export const input = $root.input = (() => {
                 object.roomName = message.roomName;
             if (message.roomState != null && message.hasOwnProperty("roomState"))
                 object.roomState = $root.input.RoomState.toObject(message.roomState, options);
+            let keys2;
+            if (message.userCharacterTypes && (keys2 = Object.keys(message.userCharacterTypes)).length) {
+                object.userCharacterTypes = {};
+                for (let j = 0; j < keys2.length; ++j)
+                    object.userCharacterTypes[keys2[j]] = options.enums === String ? $root.input.Room.CharacterType[message.userCharacterTypes[keys2[j]]] === undefined ? message.userCharacterTypes[keys2[j]] : $root.input.Room.CharacterType[message.userCharacterTypes[keys2[j]]] : message.userCharacterTypes[keys2[j]];
+            }
             return object;
         };
 
@@ -2953,6 +3042,24 @@ export const input = $root.input = (() => {
             values[valuesById[1] = "QUIT"] = 1;
             values[valuesById[2] = "START"] = 2;
             values[valuesById[3] = "STATE"] = 3;
+            return values;
+        })();
+
+        /**
+         * CharacterType enum.
+         * @name input.Room.CharacterType
+         * @enum {number}
+         * @property {number} CHARACTER_UNSPECIFIED=0 CHARACTER_UNSPECIFIED value
+         * @property {number} PINK=1 PINK value
+         * @property {number} DUDE=2 DUDE value
+         * @property {number} OWL=3 OWL value
+         */
+        Room.CharacterType = (function() {
+            const valuesById = {}, values = Object.create(valuesById);
+            values[valuesById[0] = "CHARACTER_UNSPECIFIED"] = 0;
+            values[valuesById[1] = "PINK"] = 1;
+            values[valuesById[2] = "DUDE"] = 2;
+            values[valuesById[3] = "OWL"] = 3;
             return values;
         })();
 

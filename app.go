@@ -4,7 +4,6 @@ import (
 	"animalized/message"
 	"context"
 	"encoding/base64"
-	"fmt"
 	"log/slog"
 	"net"
 
@@ -57,15 +56,6 @@ func (a *App) SendInput(msg string) error {
 	if err != nil {
 		return err
 	}
-
-	input := new(message.Input)
-	err = proto.Unmarshal(decoded, input)
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("send input:", input)
 
 	_, err = conn.Write(append(decoded, INPUT_PACKET_DELIMITER))
 

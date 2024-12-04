@@ -1050,6 +1050,9 @@ export namespace input {
 
         /** Room roomState */
         roomState?: (input.IRoomState|null);
+
+        /** Room userCharacterTypes */
+        userCharacterTypes?: ({ [k: string]: input.Room.CharacterType }|null);
     }
 
     /** Represents a Room. */
@@ -1069,6 +1072,9 @@ export namespace input {
 
         /** Room roomState. */
         public roomState?: (input.IRoomState|null);
+
+        /** Room userCharacterTypes. */
+        public userCharacterTypes: { [k: string]: input.Room.CharacterType };
 
         /**
          * Creates a new Room instance using the specified properties.
@@ -1156,6 +1162,14 @@ export namespace input {
             QUIT = 1,
             START = 2,
             STATE = 3
+        }
+
+        /** CharacterType enum. */
+        enum CharacterType {
+            CHARACTER_UNSPECIFIED = 0,
+            PINK = 1,
+            DUDE = 2,
+            OWL = 3
         }
     }
 }

@@ -40,7 +40,7 @@ export function handleHitAnimation(
   );
 
   character.counter++;
-  if (!(character.counter % STAGGER_FRAME)) {
+  if (!(character.counter % (STAGGER_FRAME * 2))) {
     character.imagePosition.x++;
   }
 

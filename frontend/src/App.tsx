@@ -119,8 +119,18 @@ function App() {
               setIsInGame(true);
             }
 
-            for (const roomUserId of roomUserNames) {
-              handleJoin(roomUserId, characters, inputs);
+            console.log(
+              "decodedInput.room?.userCharacterTypes",
+              decodedInput.room?.userCharacterTypes
+            );
+
+            for (const name of roomUserNames) {
+              handleJoin(
+                name,
+                characters,
+                inputs,
+                decodedInput.room?.userCharacterTypes?.[name]!
+              );
             }
 
             const userCharacter = characters.find((c) => c.userId === userId);
