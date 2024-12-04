@@ -21,7 +21,8 @@ export function handleInputs(
   characters: Character[],
   attacks: Attack[],
   projectileImage: HTMLImageElement,
-  userId: string
+  userId: string,
+  userCharacter: Character | null
 ) {
   ctx.clearRect(0, 0, canvasSize, canvasSize);
 
@@ -51,11 +52,19 @@ export function handleInputs(
         handleIdleAnimation(ctx, character);
       }
     });
-
-    if (character.userId === userId) {
-      handleVisibleRange(ctx, character);
-    }
   }
+
+  if (!userCharacter) {
+    const found = characters.find((character) => character.userId === userId);
+
+    if (!found) {
+      throw new Error("user character not found");
+    }
+
+    userCharacter = found;
+  }
+
+  handleVisibleRange(ctx, userCharacter);
 
   requestAnimationFrame(() =>
     handleInputs(
@@ -65,7 +74,8 @@ export function handleInputs(
       characters,
       attacks,
       projectileImage,
-      userId
+      userId,
+      userCharacter
     )
   );
 }

@@ -11,7 +11,6 @@ import proto from "./proto";
 import { handleJoin } from "./handlers/join";
 import { handleKeyDown } from "./handlers/keydown";
 import { toByteArray } from "base64-js";
-import { input } from "./proto/compiled";
 
 export const inputs: CharacterInputs = new Map();
 export const characters: Character[] = [];
@@ -50,7 +49,8 @@ function App() {
         characters,
         attacks,
         fireball,
-        userId
+        userId,
+        null
       );
     }
   }, [isInGame]);
