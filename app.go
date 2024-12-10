@@ -2,8 +2,12 @@ package main
 
 import (
 	"animalized/message"
+	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/binary"
+	"errors"
+	"fmt"
 	"log/slog"
 	"net"
 
@@ -19,7 +23,10 @@ type App struct {
 	ctx context.Context
 }
 
-var conn *net.TCPConn
+var (
+	conn    *net.TCPConn
+	sizeBuf = make([]byte, 2)
+)
 
 // NewApp creates a new App application struct
 func NewApp() *App {
@@ -57,7 +64,14 @@ func (a *App) SendInput(msg string) error {
 		return err
 	}
 
-	_, err = conn.Write(append(decoded, INPUT_PACKET_DELIMITER))
+	fmt.Println("send", decoded)
+
+	if len(decoded) > BUFFER_SIZE {
+		return errors.New("packet length must not exceed BUFFER_SIZE")
+	}
+
+	binary.BigEndian.PutUint16(sizeBuf, uint16(len(decoded)))
+	_, err = conn.Write(bytes.Join([][]byte{sizeBuf, decoded}, nil))
 
 	if err != nil {
 		slog.Error(err.Error())
@@ -85,7 +99,9 @@ func (a *App) OpenConnection(initInput *message.Input) error {
 		return err
 	}
 
-	_, err = c.Write(append(message, INPUT_PACKET_DELIMITER))
+	binary.BigEndian.PutUint16(sizeBuf, uint16(len(message)))
+
+	_, err = c.Write(bytes.Join([][]byte{sizeBuf, message}, nil))
 
 	if err != nil {
 		return err

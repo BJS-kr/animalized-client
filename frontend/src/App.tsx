@@ -92,7 +92,9 @@ function App() {
         switch (decodedInput.lobby!.type) {
           case proto.Lobby.LobbyType.STATE:
             setLobbyStatus(decodedInput.lobby as proto.Lobby);
+            break;
           case proto.Lobby.LobbyType.JOIN_ROOM:
+            console.log("join room", decodedInput);
             if (decodedInput.userId === userId) {
               if (!decodedInput.lobby?.roomName) return;
 

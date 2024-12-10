@@ -4,8 +4,14 @@ import { input as proto } from "../proto/compiled";
 
 import type { Character } from "../types";
 
+let lastKeyDown = Date.now();
+
 export const handleKeyDown =
   (character: Character) => async (event: KeyboardEvent) => {
+    if (Date.now() - lastKeyDown < 300) {
+      return;
+    }
+
     event.preventDefault();
 
     if (character.isProcessing) {
@@ -43,6 +49,8 @@ export const handleKeyDown =
       default:
         console.warn("unhandled key: ", event.key);
     }
+
+    lastKeyDown = Date.now();
 
     await SendInput(encode(input));
   };

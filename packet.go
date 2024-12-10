@@ -2,25 +2,29 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"io"
 	"net"
 )
 
 const (
-	BUFFER_SIZE            = 4096
-	INPUT_PACKET_DELIMITER = 0x1F
+	BUFFER_SIZE = 4096
 )
 
 type PacketStore struct {
-	incomingBuf []byte
-	inputBuf    *bytes.Buffer
+	incomingBuf   []byte
+	inputBuf      *bytes.Buffer
+	packetSizeBuf []byte
+	targetBuf     []byte
 }
 
 func NewStore() *PacketStore {
 	ps := new(PacketStore)
 	ps.incomingBuf = make([]byte, BUFFER_SIZE)
 	ps.inputBuf = bytes.NewBuffer(nil)
+	ps.packetSizeBuf = make([]byte, 2)
+	ps.targetBuf = make([]byte, BUFFER_SIZE)
 
 	return ps
 }
@@ -32,13 +36,7 @@ func (ps *PacketStore) ParseMessageBytes(conn net.Conn) ([]byte, error) {
 		return nil, err
 	}
 
-	stripped, err := stripDelimiter(chunk)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return stripped, nil
+	return chunk, nil
 }
 
 func (ps *PacketStore) makeChunk(conn net.Conn) ([]byte, error) {
@@ -66,17 +64,34 @@ func (ps *PacketStore) makeChunk(conn net.Conn) ([]byte, error) {
 }
 
 func (ps *PacketStore) cutChunk() ([]byte, error) {
-	chunk, err := ps.inputBuf.ReadBytes(INPUT_PACKET_DELIMITER)
+	readSizeOfPacket, err := ps.inputBuf.Read(ps.packetSizeBuf)
 
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			ps.inputBuf.Write(chunk)
+			ps.inputBuf.Write(ps.packetSizeBuf[:readSizeOfPacket])
 		}
 
-		return chunk, err
+		return ps.packetSizeBuf, err
 	}
 
-	return chunk, nil
+	packetSize := binary.BigEndian.Uint16(ps.packetSizeBuf)
+
+	if packetSize > BUFFER_SIZE {
+		return ps.targetBuf, errors.New("received packet size is bigger than BUFFER_SIZE")
+	}
+
+	targetBuf := ps.targetBuf[:packetSize]
+	readPacketSize, err := ps.inputBuf.Read(targetBuf)
+
+	if err != nil {
+		if errors.Is(err, io.EOF) {
+			ps.inputBuf.Write(targetBuf[:readPacketSize])
+		}
+
+		return targetBuf, err
+	}
+
+	return targetBuf, nil
 }
 
 func (ps *PacketStore) readInput(conn net.Conn) (int, error) {
@@ -108,15 +123,4 @@ func (ps *PacketStore) writeInput(size int) error {
 	}
 
 	return nil
-}
-
-func stripDelimiter(chunk []byte) ([]byte, error) {
-
-	l := len(chunk)
-
-	if chunk[l-1] != INPUT_PACKET_DELIMITER {
-		return chunk, errors.New("delimiter not on last position")
-	}
-
-	return chunk[:l-1], nil
 }
