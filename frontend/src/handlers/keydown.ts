@@ -8,7 +8,7 @@ let lastKeyDown = Date.now();
 
 export const handleKeyDown =
   (character: Character) => async (event: KeyboardEvent) => {
-    if (Date.now() - lastKeyDown < 300) {
+    if (Date.now() - lastKeyDown < 100) {
       return;
     }
 

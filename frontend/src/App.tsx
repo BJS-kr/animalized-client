@@ -23,6 +23,8 @@ function App() {
   const [roomUserNames, setRoomUserNames] = useState<string[]>([]);
   const [lobbyStatus, setLobbyStatus] = useState<proto.ILobby>();
   const [userId, setUserId] = useState("");
+  const [winnerId, setWinnerId] = useState("");
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const fireball = new Image();
@@ -36,7 +38,6 @@ function App() {
       ctxRef.current = canvasRef.current.getContext("2d");
     }
   });
-  ``;
 
   useEffect(() => {
     if (ctxRef.current && canvasRef.current) {
@@ -82,8 +83,9 @@ function App() {
   EventsOn("input", (msg) => {
     const decodedInput = proto.Input.decode(toByteArray(msg));
 
-    console.dir(decodedInput, { depth: null });
-    console.log("kind:!!", decodedInput.kind);
+    if (decodedInput.kind === "gameResult") {
+      console.dir(decodedInput, { depth: null });
+    }
 
     if (!decodedInput || !decodedInput.userId) return;
 
@@ -94,7 +96,6 @@ function App() {
             setLobbyStatus(decodedInput.lobby as proto.Lobby);
             break;
           case proto.Lobby.LobbyType.JOIN_ROOM:
-            console.log("join room", decodedInput);
             if (decodedInput.userId === userId) {
               if (!decodedInput.lobby?.roomName) return;
 
@@ -110,7 +111,6 @@ function App() {
         }
         break;
       case "room":
-        console.log("room input", decodedInput);
         switch (decodedInput.room!.type) {
           case proto.Room.RoomType.STATE:
             setMaxUsers(decodedInput.room?.roomState?.maxUsers || 1);
@@ -119,31 +119,32 @@ function App() {
           case proto.Room.RoomType.START:
             if (decodedInput.room?.roomName === roomName) {
               setIsInGame(true);
-            }
+              for (const name of roomUserNames) {
+                handleJoin(
+                  name,
+                  characters,
+                  inputs,
+                  decodedInput.room?.userCharacterTypes?.[name]!
+                );
+              }
 
-            console.log(
-              "decodedInput.room?.userCharacterTypes",
-              decodedInput.room?.userCharacterTypes
-            );
+              const userCharacter = characters.find((c) => c.userId === userId);
 
-            for (const name of roomUserNames) {
-              handleJoin(
-                name,
-                characters,
-                inputs,
-                decodedInput.room?.userCharacterTypes?.[name]!
+              if (!userCharacter) {
+                console.error(
+                  "user character not found",
+                  userId,
+                  roomUserNames
+                );
+                alert("user character not found");
+                return;
+              }
+
+              document.addEventListener(
+                "keydown",
+                handleKeyDown(userCharacter)
               );
             }
-
-            const userCharacter = characters.find((c) => c.userId === userId);
-
-            if (!userCharacter) {
-              console.error("user character not found", userId, roomUserNames);
-              alert("user character not found");
-              return;
-            }
-
-            document.addEventListener("keydown", handleKeyDown(userCharacter));
 
             break;
         }
@@ -163,8 +164,19 @@ function App() {
             break;
         }
         break;
+      case "gameResult":
+        if (decodedInput.gameResult!.roomName === roomName) {
+          setWinnerId(decodedInput.gameResult!.winnerId ?? "");
+          setIsInGame(false);
+          setRoomName("");
+          characters.length = 0;
+          inputs.clear();
+
+          document.addEventListener("keydown", () => {});
+        }
+        break;
       default:
-        console.error("unknown input kind", decodedInput.kind);
+        console.error("unhandled input kind", decodedInput.kind);
     }
   });
 
@@ -181,7 +193,9 @@ function App() {
       </div>
     );
   } else if (!roomName) {
-    return <Lobby lobbyStatus={lobbyStatus} userId={userId} />;
+    return (
+      <Lobby lobbyStatus={lobbyStatus} userId={userId} winnerId={winnerId} />
+    );
   } else if (roomName && !isInGame) {
     return (
       <Room

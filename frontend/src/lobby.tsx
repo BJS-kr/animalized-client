@@ -18,7 +18,8 @@ export const handleJoinRoom = (roomName: string, userId: string) => {
 export const Lobby: React.FC<{
   lobbyStatus: proto.ILobby | undefined;
   userId: string;
-}> = ({ lobbyStatus, userId }) => {
+  winnerId: string;
+}> = ({ lobbyStatus, userId, winnerId }) => {
   const [roomName, setRoomName] = useState("");
   const [maxUsers, setMaxUsers] = useState(1);
 
@@ -48,6 +49,22 @@ export const Lobby: React.FC<{
   return (
     <div>
       <h1>Lobby</h1>
+      {winnerId && (
+        <div
+          style={{
+            fontSize: "1.5em",
+            fontWeight: "bold",
+            color: "#2ecc71",
+            padding: "15px",
+            margin: "10px 0",
+            backgroundColor: "#e8f8f5",
+            borderRadius: "5px",
+            textAlign: "center",
+          }}
+        >
+          🏆 Winner was: {winnerId} 🏆
+        </div>
+      )}
       <div
         style={{
           display: "flex",
@@ -131,13 +148,13 @@ export const Lobby: React.FC<{
           <div>
             <strong>{roomState.roomName}</strong>
             <span style={{ marginLeft: "8px" }}>
-              {roomState.userIds?.length ?? 0}/{roomState.maxUsers ?? "invalid"}
               {roomState.status ===
               proto.RoomState.RoomStatusType.ROOM_STATUS_UNSPECIFIED
                 ? "invalid"
                 : roomState.status === proto.RoomState.RoomStatusType.WAITING
                 ? "waiting"
                 : "playing"}
+              {roomState.userIds?.length ?? 0}/{roomState.maxUsers ?? "invalid"}
             </span>
           </div>
           <button

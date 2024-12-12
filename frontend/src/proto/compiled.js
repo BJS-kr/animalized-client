@@ -27,6 +27,7 @@ export const input = $root.input = (() => {
          * @property {input.IOperation|null} [op] Input op
          * @property {input.ILobby|null} [lobby] Input lobby
          * @property {input.IRoom|null} [room] Input room
+         * @property {input.IGameResult|null} [gameResult] Input gameResult
          */
 
         /**
@@ -84,17 +85,25 @@ export const input = $root.input = (() => {
          */
         Input.prototype.room = null;
 
+        /**
+         * Input gameResult.
+         * @member {input.IGameResult|null|undefined} gameResult
+         * @memberof input.Input
+         * @instance
+         */
+        Input.prototype.gameResult = null;
+
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * Input kind.
-         * @member {"init"|"op"|"lobby"|"room"|undefined} kind
+         * @member {"init"|"op"|"lobby"|"room"|"gameResult"|undefined} kind
          * @memberof input.Input
          * @instance
          */
         Object.defineProperty(Input.prototype, "kind", {
-            get: $util.oneOfGetter($oneOfFields = ["init", "op", "lobby", "room"]),
+            get: $util.oneOfGetter($oneOfFields = ["init", "op", "lobby", "room", "gameResult"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -132,6 +141,8 @@ export const input = $root.input = (() => {
                 $root.input.Lobby.encode(message.lobby, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             if (message.room != null && Object.hasOwnProperty.call(message, "room"))
                 $root.input.Room.encode(message.room, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            if (message.gameResult != null && Object.hasOwnProperty.call(message, "gameResult"))
+                $root.input.GameResult.encode(message.gameResult, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
             return writer;
         };
 
@@ -184,6 +195,10 @@ export const input = $root.input = (() => {
                     }
                 case 5: {
                         message.room = $root.input.Room.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 6: {
+                        message.gameResult = $root.input.GameResult.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -263,6 +278,16 @@ export const input = $root.input = (() => {
                         return "room." + error;
                 }
             }
+            if (message.gameResult != null && message.hasOwnProperty("gameResult")) {
+                if (properties.kind === 1)
+                    return "kind: multiple values";
+                properties.kind = 1;
+                {
+                    let error = $root.input.GameResult.verify(message.gameResult);
+                    if (error)
+                        return "gameResult." + error;
+                }
+            }
             return null;
         };
 
@@ -299,6 +324,11 @@ export const input = $root.input = (() => {
                 if (typeof object.room !== "object")
                     throw TypeError(".input.Input.room: object expected");
                 message.room = $root.input.Room.fromObject(object.room);
+            }
+            if (object.gameResult != null) {
+                if (typeof object.gameResult !== "object")
+                    throw TypeError(".input.Input.gameResult: object expected");
+                message.gameResult = $root.input.GameResult.fromObject(object.gameResult);
             }
             return message;
         };
@@ -339,6 +369,11 @@ export const input = $root.input = (() => {
                 object.room = $root.input.Room.toObject(message.room, options);
                 if (options.oneofs)
                     object.kind = "room";
+            }
+            if (message.gameResult != null && message.hasOwnProperty("gameResult")) {
+                object.gameResult = $root.input.GameResult.toObject(message.gameResult, options);
+                if (options.oneofs)
+                    object.kind = "gameResult";
             }
             return object;
         };
@@ -3064,6 +3099,233 @@ export const input = $root.input = (() => {
         })();
 
         return Room;
+    })();
+
+    input.GameResult = (function() {
+
+        /**
+         * Properties of a GameResult.
+         * @memberof input
+         * @interface IGameResult
+         * @property {string|null} [winnerId] GameResult winnerId
+         * @property {string|null} [roomName] GameResult roomName
+         */
+
+        /**
+         * Constructs a new GameResult.
+         * @memberof input
+         * @classdesc Represents a GameResult.
+         * @implements IGameResult
+         * @constructor
+         * @param {input.IGameResult=} [properties] Properties to set
+         */
+        function GameResult(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * GameResult winnerId.
+         * @member {string} winnerId
+         * @memberof input.GameResult
+         * @instance
+         */
+        GameResult.prototype.winnerId = "";
+
+        /**
+         * GameResult roomName.
+         * @member {string} roomName
+         * @memberof input.GameResult
+         * @instance
+         */
+        GameResult.prototype.roomName = "";
+
+        /**
+         * Creates a new GameResult instance using the specified properties.
+         * @function create
+         * @memberof input.GameResult
+         * @static
+         * @param {input.IGameResult=} [properties] Properties to set
+         * @returns {input.GameResult} GameResult instance
+         */
+        GameResult.create = function create(properties) {
+            return new GameResult(properties);
+        };
+
+        /**
+         * Encodes the specified GameResult message. Does not implicitly {@link input.GameResult.verify|verify} messages.
+         * @function encode
+         * @memberof input.GameResult
+         * @static
+         * @param {input.IGameResult} message GameResult message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GameResult.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.winnerId != null && Object.hasOwnProperty.call(message, "winnerId"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.winnerId);
+            if (message.roomName != null && Object.hasOwnProperty.call(message, "roomName"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.roomName);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GameResult message, length delimited. Does not implicitly {@link input.GameResult.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof input.GameResult
+         * @static
+         * @param {input.IGameResult} message GameResult message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GameResult.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a GameResult message from the specified reader or buffer.
+         * @function decode
+         * @memberof input.GameResult
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {input.GameResult} GameResult
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GameResult.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.input.GameResult();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.winnerId = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.roomName = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a GameResult message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof input.GameResult
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {input.GameResult} GameResult
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GameResult.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GameResult message.
+         * @function verify
+         * @memberof input.GameResult
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GameResult.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                if (!$util.isString(message.winnerId))
+                    return "winnerId: string expected";
+            if (message.roomName != null && message.hasOwnProperty("roomName"))
+                if (!$util.isString(message.roomName))
+                    return "roomName: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a GameResult message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof input.GameResult
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {input.GameResult} GameResult
+         */
+        GameResult.fromObject = function fromObject(object) {
+            if (object instanceof $root.input.GameResult)
+                return object;
+            let message = new $root.input.GameResult();
+            if (object.winnerId != null)
+                message.winnerId = String(object.winnerId);
+            if (object.roomName != null)
+                message.roomName = String(object.roomName);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GameResult message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof input.GameResult
+         * @static
+         * @param {input.GameResult} message GameResult
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GameResult.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.winnerId = "";
+                object.roomName = "";
+            }
+            if (message.winnerId != null && message.hasOwnProperty("winnerId"))
+                object.winnerId = message.winnerId;
+            if (message.roomName != null && message.hasOwnProperty("roomName"))
+                object.roomName = message.roomName;
+            return object;
+        };
+
+        /**
+         * Converts this GameResult to JSON.
+         * @function toJSON
+         * @memberof input.GameResult
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GameResult.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for GameResult
+         * @function getTypeUrl
+         * @memberof input.GameResult
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        GameResult.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/input.GameResult";
+        };
+
+        return GameResult;
     })();
 
     return input;

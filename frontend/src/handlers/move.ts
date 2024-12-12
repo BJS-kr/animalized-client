@@ -48,8 +48,6 @@ export function handleHorizontalMove(
     stayInside(character.dimension);
     stayInside(character.goalDimension);
   }
-
-  console.log(character.dimension);
 }
 
 export function handleVerticalMove(

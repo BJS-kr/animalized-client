@@ -20,6 +20,9 @@ export namespace input {
 
         /** Input room */
         room?: (input.IRoom|null);
+
+        /** Input gameResult */
+        gameResult?: (input.IGameResult|null);
     }
 
     /** Represents an Input. */
@@ -46,8 +49,11 @@ export namespace input {
         /** Input room. */
         public room?: (input.IRoom|null);
 
+        /** Input gameResult. */
+        public gameResult?: (input.IGameResult|null);
+
         /** Input kind. */
-        public kind?: ("init"|"op"|"lobby"|"room");
+        public kind?: ("init"|"op"|"lobby"|"room"|"gameResult");
 
         /**
          * Creates a new Input instance using the specified properties.
@@ -1171,5 +1177,108 @@ export namespace input {
             DUDE = 2,
             OWL = 3
         }
+    }
+
+    /** Properties of a GameResult. */
+    interface IGameResult {
+
+        /** GameResult winnerId */
+        winnerId?: (string|null);
+
+        /** GameResult roomName */
+        roomName?: (string|null);
+    }
+
+    /** Represents a GameResult. */
+    class GameResult implements IGameResult {
+
+        /**
+         * Constructs a new GameResult.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: input.IGameResult);
+
+        /** GameResult winnerId. */
+        public winnerId: string;
+
+        /** GameResult roomName. */
+        public roomName: string;
+
+        /**
+         * Creates a new GameResult instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GameResult instance
+         */
+        public static create(properties?: input.IGameResult): input.GameResult;
+
+        /**
+         * Encodes the specified GameResult message. Does not implicitly {@link input.GameResult.verify|verify} messages.
+         * @param message GameResult message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: input.IGameResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GameResult message, length delimited. Does not implicitly {@link input.GameResult.verify|verify} messages.
+         * @param message GameResult message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: input.IGameResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GameResult message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GameResult
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): input.GameResult;
+
+        /**
+         * Decodes a GameResult message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GameResult
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): input.GameResult;
+
+        /**
+         * Verifies a GameResult message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GameResult message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GameResult
+         */
+        public static fromObject(object: { [k: string]: any }): input.GameResult;
+
+        /**
+         * Creates a plain object from a GameResult message. Also converts values to other types if specified.
+         * @param message GameResult
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: input.GameResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GameResult to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for GameResult
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 }
