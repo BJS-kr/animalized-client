@@ -42,3 +42,11 @@ export type CharacterInputs = Map<
   string,
   { character: Character; inputs: proto.Input[] }
 >;
+
+export type GameContext = {
+  terrains: proto.ITerrain[];
+  characters: Character[];
+  inputs: CharacterInputs;
+  hitMap: Map<number, boolean>;
+  attacks: Attack[];
+};

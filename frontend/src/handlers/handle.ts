@@ -11,7 +11,7 @@ import {
 import { handleCharacterNameText } from "./name";
 import { handleProjectiles } from "./projectile";
 import { handleVisibleRange } from "./vision";
-import type { Character, Attack, CharacterInputs } from "../types";
+import type { Character, Attack, CharacterInputs, GameContext } from "../types";
 import { handleHitAnimation } from "./hit";
 import { drawBackground } from "./background";
 import { drawTerrains } from "./terrains";
@@ -20,22 +20,25 @@ import proto from "../proto";
 export function handle(
   ctx: CanvasRenderingContext2D,
   canvasSize: number,
-  inputs: CharacterInputs,
-  characters: Character[],
-  attacks: Attack[],
+  gameContext: GameContext,
   projectileImage: HTMLImageElement,
   userId: string,
   userCharacter: Character | null,
-  background: HTMLImageElement,
-  terrains: proto.ITerrain[]
+  background: HTMLImageElement
 ) {
   drawBackground(ctx, background);
-  drawTerrains(ctx, terrains);
+  drawTerrains(ctx, gameContext.terrains);
 
-  handleProjectiles(ctx, attacks, projectileImage, characters, userId);
+  handleProjectiles(
+    ctx,
+    gameContext,
+    projectileImage,
 
-  for (const character of characters) {
-    applyNextInput(inputs, character, attacks, terrains);
+    userId
+  );
+
+  for (const character of gameContext.characters) {
+    applyNextInput(gameContext, character);
 
     wrapContext(ctx, () => {
       handleCharacterNameText(ctx, character);
@@ -46,7 +49,8 @@ export function handle(
         handleVerticalMove(ctx, character);
       } else if (character.isAttacking) {
         const attack = handleAttack(ctx, character);
-        attack && attacks.push({ ...attack, userId: character.userId });
+        attack &&
+          gameContext.attacks.push({ ...attack, userId: character.userId });
       } else if (character.isHit) {
         handleHitAnimation(ctx, character);
       } else {
@@ -56,7 +60,9 @@ export function handle(
   }
 
   if (!userCharacter) {
-    const found = characters.find((character) => character.userId === userId);
+    const found = gameContext.characters.find(
+      (character) => character.userId === userId
+    );
 
     if (!found) {
       throw new Error("user character not found");
@@ -71,14 +77,11 @@ export function handle(
     handle(
       ctx,
       canvasSize,
-      inputs,
-      characters,
-      attacks,
+      gameContext,
       projectileImage,
       userId,
       userCharacter,
-      background,
-      terrains
+      background
     )
   );
 }

@@ -3,17 +3,18 @@ import { message } from "../../wailsjs/go/models";
 import { encode } from "../common/encode";
 import { ATTACK_WIDTH, PROJECTILE_SPEED } from "../constansts";
 import proto from "../proto";
-import { Attack, Character, HitRange } from "../types";
+import { Attack, Character, GameContext, HitRange } from "../types";
 
 function isCharacter(
-  collidable: Character | proto.Terrain
+  collidable: Character | proto.ITerrain
 ): collidable is Character {
   return !!(collidable as Character).userId;
 }
 
 export async function handleCollision(
+  gameContext: GameContext,
   attack: Attack,
-  collidable: Character | (proto.Terrain & { id: number })
+  collidable: Character | (proto.ITerrain & { id: number })
 ) {
   const hitRange = determineHitRange(attack);
 
@@ -23,6 +24,7 @@ export async function handleCollision(
     collidable.position!.x! >= hitRange[0] &&
     collidable.position!.x! <= hitRange[1]
   ) {
+    gameContext.hitMap.set(attack.id, true);
     const input = new proto.Input();
     const operation = new proto.Operation();
     input.userId = attack.userId;

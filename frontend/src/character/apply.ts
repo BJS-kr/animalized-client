@@ -1,16 +1,13 @@
 import { message } from "../../wailsjs/go/models";
 import { CELL_SIZE } from "../constansts";
 import proto from "../proto";
-import type { Attack, Character, CharacterInputs } from "../types";
+import type { Attack, Character, CharacterInputs, GameContext } from "../types";
 
-export function applyNextInput(
-  inputs: CharacterInputs,
-  character: Character,
-  attacks: Attack[],
-  terrains: proto.ITerrain[]
-) {
+export function applyNextInput(gameContext: GameContext, character: Character) {
   if (!character.isProcessing) {
-    const characterInput = inputs.get(character.userId)?.inputs.shift();
+    const characterInput = gameContext.inputs
+      .get(character.userId)
+      ?.inputs.shift();
 
     if (!characterInput) {
       return;
@@ -52,7 +49,7 @@ export function applyNextInput(
     ) {
       character.isAttacking = true;
     } else if (characterInput.op.type === proto.Operation.OperationType.HIT) {
-      const targetAttack = attacks.find(
+      const targetAttack = gameContext.attacks.find(
         (attack) =>
           attack.id === characterInput?.op?.projectileId &&
           attack.remainDistance > 0
@@ -61,7 +58,37 @@ export function applyNextInput(
         return;
       }
       targetAttack.remainDistance = 0;
-      character.isHit = true;
+
+      if (characterInput.op.targetTerrainId) {
+        const targetTerrain =
+          gameContext.terrains[characterInput.op.targetTerrainId];
+
+        if (!targetTerrain) {
+          return;
+        }
+
+        if (targetTerrain.type === proto.TerrainType.ROCK) {
+          switch (targetTerrain.state) {
+            case proto.TerrainState.SOLID:
+              targetTerrain.state = proto.TerrainState.DAMAGED;
+              break;
+            case proto.TerrainState.DAMAGED:
+              targetTerrain.state = proto.TerrainState.VULNERABLE;
+              break;
+            case proto.TerrainState.VULNERABLE:
+              targetTerrain.state = proto.TerrainState.DESTROYED;
+              break;
+            case proto.TerrainState.DESTROYED:
+              break;
+            default:
+              console.warn("unexpected terrain state");
+          }
+        }
+      } else {
+        character.isHit = true;
+      }
+
+      gameContext.hitMap.delete(characterInput.op.projectileId!);
     }
   }
 }

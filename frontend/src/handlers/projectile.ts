@@ -1,32 +1,38 @@
 import { ATTACK_WIDTH, PROJECTILE_SPEED } from "../constansts";
 import { stayInside } from "../helper/stay";
-import type { Attack, Character, HitRange } from "../types";
+import proto from "../proto";
+import type { Attack, Character, GameContext, HitRange } from "../types";
 import { handleCollision } from "./collide";
 
 export function handleProjectiles(
   ctx: CanvasRenderingContext2D,
-  attacks: Attack[],
+  gameContext: GameContext,
   projectileImage: HTMLImageElement,
-  characters: Character[],
   userId: string
 ) {
-  for (const attack of attacks) {
+  for (const attack of gameContext.attacks) {
     if (attack.remainDistance <= 0) {
       continue;
     }
-    handleProjectile(ctx, attack, projectileImage, characters, userId);
+    handleProjectile(ctx, gameContext, attack, projectileImage, userId);
   }
 
-  attacks = attacks.filter((attack) => attack.remainDistance > 0);
+  gameContext.attacks = gameContext.attacks.filter(
+    (attack) => attack.remainDistance > 0
+  );
 }
 
 export function handleProjectile(
   ctx: CanvasRenderingContext2D,
+  gameContext: GameContext,
   attack: Attack,
   projectileImage: HTMLImageElement,
-  characters: Character[],
   userId: string
 ) {
+  if (gameContext.hitMap.get(attack.id)) {
+    return;
+  }
+
   ctx.save();
 
   attack.remainDistance -= PROJECTILE_SPEED;
@@ -35,9 +41,29 @@ export function handleProjectile(
   forwardProjectile(attack);
   drawProjectile(ctx, attack, projectileImage);
 
-  for (let i = 0; i < characters.length; i++) {
+  for (let i = 0; i < gameContext.characters.length; i++) {
     if (attack.userId === userId) {
-      handleCollision(attack, characters[i]);
+      handleCollision(gameContext, attack, gameContext.characters[i]);
+    }
+
+    if (gameContext.hitMap.get(attack.id)) {
+      return;
+    }
+  }
+
+  for (let i = 1; i < gameContext.terrains.length; i++) {
+    if (
+      attack.userId === userId &&
+      gameContext.terrains[i].state !== proto.TerrainState.DESTROYED
+    ) {
+      handleCollision(gameContext, attack, {
+        ...gameContext.terrains[i],
+        id: i,
+      });
+    }
+
+    if (gameContext.hitMap.get(attack.id)) {
+      return;
     }
   }
   attack.count++;

@@ -33,7 +33,12 @@ function isBlocked(
   }
 
   return !!terrains.find((terrain) => {
-    if (!terrain || !terrain.position) return false;
+    if (
+      !terrain ||
+      !terrain.position ||
+      terrain.state === proto.TerrainState.DESTROYED
+    )
+      return false;
     return terrain.position!.x === pos.x && terrain.position!.y === pos.y;
   });
 }

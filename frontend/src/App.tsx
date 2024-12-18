@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { CANVAS_SIZE, CELL_SIZE } from "./constansts";
-import type { Attack, Character, CharacterInputs } from "./types";
+import type { Attack, Character, CharacterInputs, GameContext } from "./types";
 import { handle } from "./handlers/handle";
 import { handleJoinRoom, Lobby } from "./lobby";
 import { Room } from "./room";
@@ -13,14 +13,12 @@ import { handleKeyDown } from "./handlers/keydown";
 import { toByteArray } from "base64-js";
 import { makeFireball } from "./common/fireball";
 
-export const gameContext: {
-  terrains: proto.ITerrain[];
-  characters: Character[];
-  inputs: CharacterInputs;
-} = {
+export const gameContext: GameContext = {
   terrains: [],
   characters: [],
   inputs: new Map(),
+  hitMap: new Map(),
+  attacks: [],
 };
 
 function App() {
@@ -46,19 +44,14 @@ function App() {
 
   useEffect(() => {
     if (ctxRef.current && canvasRef.current) {
-      const attacks: Attack[] = [];
-
       handle(
         ctxRef.current!,
         CANVAS_SIZE,
-        gameContext.inputs,
-        gameContext.characters,
-        attacks,
+        gameContext,
         fireball,
         userId,
         null,
-        grass,
-        gameContext.terrains
+        grass
       );
     }
   }, [isInGame]);
@@ -123,17 +116,8 @@ function App() {
             break;
           case proto.Room.RoomType.START:
             if (decodedInput.room?.roomName === roomName) {
-              const positioned = decodedInput.room!.terrains!.map((t) => {
-                if (!t || !t.position) return t;
+              gameContext.terrains = decodedInput.room!.terrains!;
 
-                const pos = {
-                  x: t.position!.x! * CELL_SIZE,
-                  y: t.position!.y! * CELL_SIZE,
-                };
-
-                return { ...t, position: pos };
-              });
-              gameContext.terrains = positioned;
               setIsInGame(true);
               for (const name of roomUserNames) {
                 handleJoin(
@@ -180,9 +164,18 @@ function App() {
               .inputs.push(decodedInput);
             break;
           case proto.Operation.OperationType.HIT:
-            gameContext.inputs
-              .get(decodedInput.op!.targetUserId!)!
-              .inputs.push(decodedInput);
+            if (
+              !decodedInput.op!.targetUserId &&
+              decodedInput.op!.targetTerrainId
+            ) {
+              gameContext.inputs
+                .get(decodedInput.userId)!
+                .inputs.push(decodedInput);
+            } else {
+              gameContext.inputs
+                .get(decodedInput.op!.targetUserId!)!
+                .inputs.push(decodedInput);
+            }
             break;
         }
         break;
