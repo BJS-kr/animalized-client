@@ -15,13 +15,10 @@ export function handleAttack(
   character: Character
 ): Attack | null {
   if (character.heading === "right") {
-    ctx.translate(character.dimension.x, character.dimension.y);
+    ctx.translate(character.position.x, character.position.y);
     ctx.scale(1, 1);
   } else if (character.heading === "left") {
-    ctx.translate(
-      character.dimension.x + CHARACTER_WIDTH,
-      character.dimension.y
-    );
+    ctx.translate(character.position.x + CHARACTER_WIDTH, character.position.y);
     ctx.scale(-1, 1);
   } else {
     throw new Error("invalid heading when attack");
@@ -51,7 +48,7 @@ export function handleAttack(
 
     return {
       id: attackId++,
-      dimension: { x: character.dimension.x, y: character.dimension.y },
+      position: { x: character.position.x, y: character.position.y },
       heading: character.heading,
       remainDistance: CELL_SIZE * ATTACK_RANGE,
       count: 0,

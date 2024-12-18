@@ -254,6 +254,9 @@ export namespace input {
         /** Operation targetUserId */
         targetUserId?: (string|null);
 
+        /** Operation targetTerrainId */
+        targetTerrainId?: (number|null);
+
         /** Operation projectileId */
         projectileId?: (number|null);
 
@@ -287,6 +290,9 @@ export namespace input {
 
         /** Operation targetUserId. */
         public targetUserId: string;
+
+        /** Operation targetTerrainId. */
+        public targetTerrainId: number;
 
         /** Operation projectileId. */
         public projectileId: number;
@@ -1059,6 +1065,9 @@ export namespace input {
 
         /** Room userCharacterTypes */
         userCharacterTypes?: ({ [k: string]: input.Room.CharacterType }|null);
+
+        /** Room terrains */
+        terrains?: (input.ITerrain[]|null);
     }
 
     /** Represents a Room. */
@@ -1081,6 +1090,9 @@ export namespace input {
 
         /** Room userCharacterTypes. */
         public userCharacterTypes: { [k: string]: input.Room.CharacterType };
+
+        /** Room terrains. */
+        public terrains: input.ITerrain[];
 
         /**
          * Creates a new Room instance using the specified properties.
@@ -1280,5 +1292,129 @@ export namespace input {
          * @returns The default type url
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a Terrain. */
+    interface ITerrain {
+
+        /** Terrain type */
+        type?: (input.TerrainType|null);
+
+        /** Terrain state */
+        state?: (input.TerrainState|null);
+
+        /** Terrain position */
+        position?: (input.IPosition|null);
+    }
+
+    /** Represents a Terrain. */
+    class Terrain implements ITerrain {
+
+        /**
+         * Constructs a new Terrain.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: input.ITerrain);
+
+        /** Terrain type. */
+        public type: input.TerrainType;
+
+        /** Terrain state. */
+        public state: input.TerrainState;
+
+        /** Terrain position. */
+        public position?: (input.IPosition|null);
+
+        /**
+         * Creates a new Terrain instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Terrain instance
+         */
+        public static create(properties?: input.ITerrain): input.Terrain;
+
+        /**
+         * Encodes the specified Terrain message. Does not implicitly {@link input.Terrain.verify|verify} messages.
+         * @param message Terrain message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: input.ITerrain, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Terrain message, length delimited. Does not implicitly {@link input.Terrain.verify|verify} messages.
+         * @param message Terrain message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: input.ITerrain, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Terrain message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Terrain
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): input.Terrain;
+
+        /**
+         * Decodes a Terrain message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Terrain
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): input.Terrain;
+
+        /**
+         * Verifies a Terrain message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Terrain message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Terrain
+         */
+        public static fromObject(object: { [k: string]: any }): input.Terrain;
+
+        /**
+         * Creates a plain object from a Terrain message. Also converts values to other types if specified.
+         * @param message Terrain
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: input.Terrain, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Terrain to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for Terrain
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** TerrainType enum. */
+    enum TerrainType {
+        TERRAIN_UNSPECIFIED = 0,
+        ROCK = 1
+    }
+
+    /** TerrainState enum. */
+    enum TerrainState {
+        TERRAIN_STATE_UNSPECIFIED = 0,
+        SOLID = 1,
+        DAMAGED = 2,
+        VULNERABLE = 3,
+        DESTROYED = 4
     }
 }

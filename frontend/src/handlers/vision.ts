@@ -14,8 +14,8 @@ export function handleVisibleRange(
 ) {
   ctx.beginPath();
   ctx.arc(
-    character.dimension.x + CHARACTER_WIDTH / 2,
-    character.dimension.y + CHARACTER_HEIGHT / 2,
+    character.position.x + CHARACTER_WIDTH / 2,
+    character.position.y + CHARACTER_HEIGHT / 2,
     VISUAL_RANGE * CELL_SIZE,
     0,
     Math.PI * 2,

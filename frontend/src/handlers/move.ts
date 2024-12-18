@@ -13,12 +13,12 @@ export function handleHorizontalMove(
   ctx: CanvasRenderingContext2D,
   character: Character
 ) {
-  const isLeft = character.dimension.x > character.goalDimension.x;
+  const isLeft = character.position.x > character.goalPosition.x;
   const xOffset = isLeft ? CHARACTER_WIDTH : 0;
   const scaleDirection = isLeft ? -1 : 1;
   const heading = isLeft ? "left" : "right";
 
-  ctx.translate(character.dimension.x + xOffset, character.dimension.y);
+  ctx.translate(character.position.x + xOffset, character.position.y);
   ctx.scale(scaleDirection, 1);
   character.heading = heading;
 
@@ -36,8 +36,8 @@ export function handleHorizontalMove(
 
   character.counter++;
   if (character.counter % STAGGER_FRAME === 0) {
-    character.dimension.x +=
-      character.dimension.x > character.goalDimension.x ? -SPEED : SPEED;
+    character.position.x +=
+      character.position.x > character.goalPosition.x ? -SPEED : SPEED;
     character.imagePosition.x++;
     character.counter = 0;
 
@@ -45,8 +45,8 @@ export function handleHorizontalMove(
       character.imagePosition.x = 1;
     }
 
-    stayInside(character.dimension);
-    stayInside(character.goalDimension);
+    stayInside(character.position);
+    stayInside(character.goalPosition);
   }
 }
 
@@ -54,7 +54,7 @@ export function handleVerticalMove(
   ctx: CanvasRenderingContext2D,
   character: Character
 ) {
-  ctx.translate(character.dimension.x, character.dimension.y);
+  ctx.translate(character.position.x, character.position.y);
   ctx.drawImage(
     character.imageSet.climb,
     character.imagePosition.x * CHARACTER_WIDTH,
@@ -69,25 +69,23 @@ export function handleVerticalMove(
 
   character.counter++;
   if (character.counter % STAGGER_FRAME === 0) {
-    character.dimension.y +=
-      character.dimension.y > character.goalDimension.y ? -SPEED : SPEED;
+    character.position.y +=
+      character.position.y > character.goalPosition.y ? -SPEED : SPEED;
     character.imagePosition.x++;
     character.counter = 0;
 
     if (character.imagePosition.x >= CLIMB_FRAME_COUNT) {
       character.imagePosition.x = 0;
     }
-    stayInside(character.dimension);
-    stayInside(character.goalDimension);
+    stayInside(character.position);
+    stayInside(character.goalPosition);
   }
-
-  console.log(character.dimension);
 }
 
 export function isHorizontallyDifferent(character: Character): boolean {
-  return character.dimension.x !== character.goalDimension.x;
+  return character.position.x !== character.goalPosition.x;
 }
 
 export function isVerticallyDifferent(character: Character): boolean {
-  return character.dimension.y !== character.goalDimension.y;
+  return character.position.y !== character.goalPosition.y;
 }

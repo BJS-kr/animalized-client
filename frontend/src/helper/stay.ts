@@ -1,16 +1,16 @@
 import { CANVAS_SIZE } from "../constansts";
-import type { Dimension } from "../types";
+import type { Position } from "../types";
 
-export function stayInside(dimension: Dimension) {
-  if (dimension.x > CANVAS_SIZE) {
-    dimension.x = 0;
-  } else if (dimension.x < 0) {
-    dimension.x = CANVAS_SIZE;
+export function stayInside(position: Position) {
+  if (position.x > CANVAS_SIZE) {
+    position.x = 0;
+  } else if (position.x < 0) {
+    position.x = CANVAS_SIZE;
   }
 
-  if (dimension.y > CANVAS_SIZE) {
-    dimension.y = 0;
-  } else if (dimension.y < 0) {
-    dimension.y = CANVAS_SIZE;
+  if (position.y > CANVAS_SIZE) {
+    position.y = 0;
+  } else if (position.y < 0) {
+    position.y = CANVAS_SIZE;
   }
 }

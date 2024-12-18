@@ -7,7 +7,7 @@ export function handleCharacterNameText(
   const usernameTextOffset = character.heading === "left" ? 3 : 0;
   ctx.fillText(
     character.userId,
-    character.dimension.x + usernameTextOffset + 3,
-    character.dimension.y
+    character.position.x + usernameTextOffset + 3,
+    character.position.y
   );
 }

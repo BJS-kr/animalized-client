@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CANVAS_SIZE } from "./constansts";
+import { CANVAS_SIZE, CELL_SIZE } from "./constansts";
 import type { Attack, Character, CharacterInputs } from "./types";
-import { handleInputs } from "./handlers/inputs";
+import { handle } from "./handlers/handle";
 import { handleJoinRoom, Lobby } from "./lobby";
 import { Room } from "./room";
 import { EventsOn, EventsOff } from "../wailsjs/runtime/runtime";
@@ -11,9 +11,17 @@ import proto from "./proto";
 import { handleJoin } from "./handlers/join";
 import { handleKeyDown } from "./handlers/keydown";
 import { toByteArray } from "base64-js";
+import { makeFireball } from "./common/fireball";
 
-export const inputs: CharacterInputs = new Map();
-export const characters: Character[] = [];
+export const gameContext: {
+  terrains: proto.ITerrain[];
+  characters: Character[];
+  inputs: CharacterInputs;
+} = {
+  terrains: [],
+  characters: [],
+  inputs: new Map(),
+};
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,14 +32,11 @@ function App() {
   const [lobbyStatus, setLobbyStatus] = useState<proto.ILobby>();
   const [userId, setUserId] = useState("");
   const [winnerId, setWinnerId] = useState("");
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
-  const fireball = new Image();
-
-  fireball.src = "/sprites/fireball/fireball.png";
-  fireball.width = 30;
-  fireball.height = 20;
+  const fireball = makeFireball();
+  const grass = new Image();
+  grass.src = "/sprites/terrains/grass.png";
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -43,15 +48,17 @@ function App() {
     if (ctxRef.current && canvasRef.current) {
       const attacks: Attack[] = [];
 
-      handleInputs(
+      handle(
         ctxRef.current!,
         CANVAS_SIZE,
-        inputs,
-        characters,
+        gameContext.inputs,
+        gameContext.characters,
         attacks,
         fireball,
         userId,
-        null
+        null,
+        grass,
+        gameContext.terrains
       );
     }
   }, [isInGame]);
@@ -83,9 +90,7 @@ function App() {
   EventsOn("input", (msg) => {
     const decodedInput = proto.Input.decode(toByteArray(msg));
 
-    if (decodedInput.kind === "gameResult") {
-      console.dir(decodedInput, { depth: null });
-    }
+    console.dir(decodedInput, { depth: null });
 
     if (!decodedInput || !decodedInput.userId) return;
 
@@ -118,17 +123,30 @@ function App() {
             break;
           case proto.Room.RoomType.START:
             if (decodedInput.room?.roomName === roomName) {
+              const positioned = decodedInput.room!.terrains!.map((t) => {
+                if (!t || !t.position) return t;
+
+                const pos = {
+                  x: t.position!.x! * CELL_SIZE,
+                  y: t.position!.y! * CELL_SIZE,
+                };
+
+                return { ...t, position: pos };
+              });
+              gameContext.terrains = positioned;
               setIsInGame(true);
               for (const name of roomUserNames) {
                 handleJoin(
                   name,
-                  characters,
-                  inputs,
+                  gameContext.characters,
+                  gameContext.inputs,
                   decodedInput.room?.userCharacterTypes?.[name]!
                 );
               }
 
-              const userCharacter = characters.find((c) => c.userId === userId);
+              const userCharacter = gameContext.characters.find(
+                (c) => c.userId === userId
+              );
 
               if (!userCharacter) {
                 console.error(
@@ -142,7 +160,7 @@ function App() {
 
               document.addEventListener(
                 "keydown",
-                handleKeyDown(userCharacter)
+                handleKeyDown(userCharacter, gameContext.terrains)
               );
             }
 
@@ -152,13 +170,17 @@ function App() {
       case "op":
         switch (decodedInput.op!.type) {
           case proto.Operation.OperationType.MOVE:
-            inputs.get(decodedInput.userId)!.inputs.push(decodedInput);
+            gameContext.inputs
+              .get(decodedInput.userId)!
+              .inputs.push(decodedInput);
             break;
           case proto.Operation.OperationType.ATTACK:
-            inputs.get(decodedInput.userId)!.inputs.push(decodedInput);
+            gameContext.inputs
+              .get(decodedInput.userId)!
+              .inputs.push(decodedInput);
             break;
           case proto.Operation.OperationType.HIT:
-            inputs
+            gameContext.inputs
               .get(decodedInput.op!.targetUserId!)!
               .inputs.push(decodedInput);
             break;
@@ -169,8 +191,9 @@ function App() {
           setWinnerId(decodedInput.gameResult!.winnerId ?? "");
           setIsInGame(false);
           setRoomName("");
-          characters.length = 0;
-          inputs.clear();
+          gameContext.characters.length = 0;
+          gameContext.inputs.clear();
+          gameContext.terrains.length = 0;
 
           document.addEventListener("keydown", () => {});
         }

@@ -13,8 +13,11 @@ import { handleProjectiles } from "./projectile";
 import { handleVisibleRange } from "./vision";
 import type { Character, Attack, CharacterInputs } from "../types";
 import { handleHitAnimation } from "./hit";
+import { drawBackground } from "./background";
+import { drawTerrains } from "./terrains";
+import proto from "../proto";
 
-export function handleInputs(
+export function handle(
   ctx: CanvasRenderingContext2D,
   canvasSize: number,
   inputs: CharacterInputs,
@@ -22,19 +25,17 @@ export function handleInputs(
   attacks: Attack[],
   projectileImage: HTMLImageElement,
   userId: string,
-  userCharacter: Character | null
+  userCharacter: Character | null,
+  background: HTMLImageElement,
+  terrains: proto.ITerrain[]
 ) {
-  ctx.clearRect(0, 0, canvasSize, canvasSize);
-
-  ctx.save();
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, canvasSize, canvasSize);
-  ctx.restore();
+  drawBackground(ctx, background);
+  drawTerrains(ctx, terrains);
 
   handleProjectiles(ctx, attacks, projectileImage, characters, userId);
 
   for (const character of characters) {
-    applyNextInput(inputs, character, attacks);
+    applyNextInput(inputs, character, attacks, terrains);
 
     wrapContext(ctx, () => {
       handleCharacterNameText(ctx, character);
@@ -67,7 +68,7 @@ export function handleInputs(
   handleVisibleRange(ctx, userCharacter);
 
   requestAnimationFrame(() =>
-    handleInputs(
+    handle(
       ctx,
       canvasSize,
       inputs,
@@ -75,7 +76,9 @@ export function handleInputs(
       attacks,
       projectileImage,
       userId,
-      userCharacter
+      userCharacter,
+      background,
+      terrains
     )
   );
 }

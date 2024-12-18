@@ -645,6 +645,7 @@ export const input = $root.input = (() => {
          * @property {input.Operation.IHitRange|null} [hitRange] Operation hitRange
          * @property {input.Operation.IGameState|null} [gameState] Operation gameState
          * @property {string|null} [targetUserId] Operation targetUserId
+         * @property {number|null} [targetTerrainId] Operation targetTerrainId
          * @property {number|null} [projectileId] Operation projectileId
          * @property {number|Long|null} [context] Operation context
          * @property {number|Long|null} [prevContext] Operation prevContext
@@ -706,6 +707,14 @@ export const input = $root.input = (() => {
         Operation.prototype.targetUserId = "";
 
         /**
+         * Operation targetTerrainId.
+         * @member {number} targetTerrainId
+         * @memberof input.Operation
+         * @instance
+         */
+        Operation.prototype.targetTerrainId = 0;
+
+        /**
          * Operation projectileId.
          * @member {number} projectileId
          * @memberof input.Operation
@@ -763,12 +772,14 @@ export const input = $root.input = (() => {
                 $root.input.Operation.GameState.encode(message.gameState, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
             if (message.targetUserId != null && Object.hasOwnProperty.call(message, "targetUserId"))
                 writer.uint32(/* id 5, wireType 2 =*/42).string(message.targetUserId);
+            if (message.targetTerrainId != null && Object.hasOwnProperty.call(message, "targetTerrainId"))
+                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.targetTerrainId);
             if (message.projectileId != null && Object.hasOwnProperty.call(message, "projectileId"))
-                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.projectileId);
+                writer.uint32(/* id 7, wireType 0 =*/56).int32(message.projectileId);
             if (message.context != null && Object.hasOwnProperty.call(message, "context"))
-                writer.uint32(/* id 7, wireType 0 =*/56).int64(message.context);
+                writer.uint32(/* id 8, wireType 0 =*/64).int64(message.context);
             if (message.prevContext != null && Object.hasOwnProperty.call(message, "prevContext"))
-                writer.uint32(/* id 8, wireType 0 =*/64).int64(message.prevContext);
+                writer.uint32(/* id 9, wireType 0 =*/72).int64(message.prevContext);
             return writer;
         };
 
@@ -824,14 +835,18 @@ export const input = $root.input = (() => {
                         break;
                     }
                 case 6: {
-                        message.projectileId = reader.int32();
+                        message.targetTerrainId = reader.int32();
                         break;
                     }
                 case 7: {
-                        message.context = reader.int64();
+                        message.projectileId = reader.int32();
                         break;
                     }
                 case 8: {
+                        message.context = reader.int64();
+                        break;
+                    }
+                case 9: {
                         message.prevContext = reader.int64();
                         break;
                     }
@@ -905,6 +920,9 @@ export const input = $root.input = (() => {
             if (message.targetUserId != null && message.hasOwnProperty("targetUserId"))
                 if (!$util.isString(message.targetUserId))
                     return "targetUserId: string expected";
+            if (message.targetTerrainId != null && message.hasOwnProperty("targetTerrainId"))
+                if (!$util.isInteger(message.targetTerrainId))
+                    return "targetTerrainId: integer expected";
             if (message.projectileId != null && message.hasOwnProperty("projectileId"))
                 if (!$util.isInteger(message.projectileId))
                     return "projectileId: integer expected";
@@ -997,6 +1015,8 @@ export const input = $root.input = (() => {
             }
             if (object.targetUserId != null)
                 message.targetUserId = String(object.targetUserId);
+            if (object.targetTerrainId != null)
+                message.targetTerrainId = object.targetTerrainId | 0;
             if (object.projectileId != null)
                 message.projectileId = object.projectileId | 0;
             if (object.context != null)
@@ -1039,6 +1059,7 @@ export const input = $root.input = (() => {
                 object.hitRange = null;
                 object.gameState = null;
                 object.targetUserId = "";
+                object.targetTerrainId = 0;
                 object.projectileId = 0;
                 if ($util.Long) {
                     let long = new $util.Long(0, 0, false);
@@ -1061,6 +1082,8 @@ export const input = $root.input = (() => {
                 object.gameState = $root.input.Operation.GameState.toObject(message.gameState, options);
             if (message.targetUserId != null && message.hasOwnProperty("targetUserId"))
                 object.targetUserId = message.targetUserId;
+            if (message.targetTerrainId != null && message.hasOwnProperty("targetTerrainId"))
+                object.targetTerrainId = message.targetTerrainId;
             if (message.projectileId != null && message.hasOwnProperty("projectileId"))
                 object.projectileId = message.projectileId;
             if (message.context != null && message.hasOwnProperty("context"))
@@ -2702,6 +2725,7 @@ export const input = $root.input = (() => {
          * @property {string|null} [roomName] Room roomName
          * @property {input.IRoomState|null} [roomState] Room roomState
          * @property {Object.<string,input.Room.CharacterType>|null} [userCharacterTypes] Room userCharacterTypes
+         * @property {Array.<input.ITerrain>|null} [terrains] Room terrains
          */
 
         /**
@@ -2714,6 +2738,7 @@ export const input = $root.input = (() => {
          */
         function Room(properties) {
             this.userCharacterTypes = {};
+            this.terrains = [];
             if (properties)
                 for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null)
@@ -2753,6 +2778,14 @@ export const input = $root.input = (() => {
         Room.prototype.userCharacterTypes = $util.emptyObject;
 
         /**
+         * Room terrains.
+         * @member {Array.<input.ITerrain>} terrains
+         * @memberof input.Room
+         * @instance
+         */
+        Room.prototype.terrains = $util.emptyArray;
+
+        /**
          * Creates a new Room instance using the specified properties.
          * @function create
          * @memberof input.Room
@@ -2785,6 +2818,9 @@ export const input = $root.input = (() => {
             if (message.userCharacterTypes != null && Object.hasOwnProperty.call(message, "userCharacterTypes"))
                 for (let keys = Object.keys(message.userCharacterTypes), i = 0; i < keys.length; ++i)
                     writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 0 =*/16).int32(message.userCharacterTypes[keys[i]]).ldelim();
+            if (message.terrains != null && message.terrains.length)
+                for (let i = 0; i < message.terrains.length; ++i)
+                    $root.input.Terrain.encode(message.terrains[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
             return writer;
         };
 
@@ -2854,6 +2890,12 @@ export const input = $root.input = (() => {
                         message.userCharacterTypes[key] = value;
                         break;
                     }
+                case 6: {
+                        if (!(message.terrains && message.terrains.length))
+                            message.terrains = [];
+                        message.terrains.push($root.input.Terrain.decode(reader, reader.uint32()));
+                        break;
+                    }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -2921,6 +2963,15 @@ export const input = $root.input = (() => {
                     case 3:
                         break;
                     }
+            }
+            if (message.terrains != null && message.hasOwnProperty("terrains")) {
+                if (!Array.isArray(message.terrains))
+                    return "terrains: array expected";
+                for (let i = 0; i < message.terrains.length; ++i) {
+                    let error = $root.input.Terrain.verify(message.terrains[i]);
+                    if (error)
+                        return "terrains." + error;
+                }
             }
             return null;
         };
@@ -2998,6 +3049,16 @@ export const input = $root.input = (() => {
                         break;
                     }
             }
+            if (object.terrains) {
+                if (!Array.isArray(object.terrains))
+                    throw TypeError(".input.Room.terrains: array expected");
+                message.terrains = [];
+                for (let i = 0; i < object.terrains.length; ++i) {
+                    if (typeof object.terrains[i] !== "object")
+                        throw TypeError(".input.Room.terrains: object expected");
+                    message.terrains[i] = $root.input.Terrain.fromObject(object.terrains[i]);
+                }
+            }
             return message;
         };
 
@@ -3014,6 +3075,8 @@ export const input = $root.input = (() => {
             if (!options)
                 options = {};
             let object = {};
+            if (options.arrays || options.defaults)
+                object.terrains = [];
             if (options.objects || options.defaults)
                 object.userCharacterTypes = {};
             if (options.defaults) {
@@ -3032,6 +3095,11 @@ export const input = $root.input = (() => {
                 object.userCharacterTypes = {};
                 for (let j = 0; j < keys2.length; ++j)
                     object.userCharacterTypes[keys2[j]] = options.enums === String ? $root.input.Room.CharacterType[message.userCharacterTypes[keys2[j]]] === undefined ? message.userCharacterTypes[keys2[j]] : $root.input.Room.CharacterType[message.userCharacterTypes[keys2[j]]] : message.userCharacterTypes[keys2[j]];
+            }
+            if (message.terrains && message.terrains.length) {
+                object.terrains = [];
+                for (let j = 0; j < message.terrains.length; ++j)
+                    object.terrains[j] = $root.input.Terrain.toObject(message.terrains[j], options);
             }
             return object;
         };
@@ -3326,6 +3394,348 @@ export const input = $root.input = (() => {
         };
 
         return GameResult;
+    })();
+
+    input.Terrain = (function() {
+
+        /**
+         * Properties of a Terrain.
+         * @memberof input
+         * @interface ITerrain
+         * @property {input.TerrainType|null} [type] Terrain type
+         * @property {input.TerrainState|null} [state] Terrain state
+         * @property {input.IPosition|null} [position] Terrain position
+         */
+
+        /**
+         * Constructs a new Terrain.
+         * @memberof input
+         * @classdesc Represents a Terrain.
+         * @implements ITerrain
+         * @constructor
+         * @param {input.ITerrain=} [properties] Properties to set
+         */
+        function Terrain(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Terrain type.
+         * @member {input.TerrainType} type
+         * @memberof input.Terrain
+         * @instance
+         */
+        Terrain.prototype.type = 0;
+
+        /**
+         * Terrain state.
+         * @member {input.TerrainState} state
+         * @memberof input.Terrain
+         * @instance
+         */
+        Terrain.prototype.state = 0;
+
+        /**
+         * Terrain position.
+         * @member {input.IPosition|null|undefined} position
+         * @memberof input.Terrain
+         * @instance
+         */
+        Terrain.prototype.position = null;
+
+        /**
+         * Creates a new Terrain instance using the specified properties.
+         * @function create
+         * @memberof input.Terrain
+         * @static
+         * @param {input.ITerrain=} [properties] Properties to set
+         * @returns {input.Terrain} Terrain instance
+         */
+        Terrain.create = function create(properties) {
+            return new Terrain(properties);
+        };
+
+        /**
+         * Encodes the specified Terrain message. Does not implicitly {@link input.Terrain.verify|verify} messages.
+         * @function encode
+         * @memberof input.Terrain
+         * @static
+         * @param {input.ITerrain} message Terrain message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Terrain.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.type != null && Object.hasOwnProperty.call(message, "type"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
+            if (message.state != null && Object.hasOwnProperty.call(message, "state"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.state);
+            if (message.position != null && Object.hasOwnProperty.call(message, "position"))
+                $root.input.Position.encode(message.position, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Terrain message, length delimited. Does not implicitly {@link input.Terrain.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof input.Terrain
+         * @static
+         * @param {input.ITerrain} message Terrain message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Terrain.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Terrain message from the specified reader or buffer.
+         * @function decode
+         * @memberof input.Terrain
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {input.Terrain} Terrain
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Terrain.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.input.Terrain();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.type = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.state = reader.int32();
+                        break;
+                    }
+                case 3: {
+                        message.position = $root.input.Position.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Terrain message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof input.Terrain
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {input.Terrain} Terrain
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Terrain.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Terrain message.
+         * @function verify
+         * @memberof input.Terrain
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Terrain.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                switch (message.type) {
+                default:
+                    return "type: enum value expected";
+                case 0:
+                case 1:
+                    break;
+                }
+            if (message.state != null && message.hasOwnProperty("state"))
+                switch (message.state) {
+                default:
+                    return "state: enum value expected";
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                    break;
+                }
+            if (message.position != null && message.hasOwnProperty("position")) {
+                let error = $root.input.Position.verify(message.position);
+                if (error)
+                    return "position." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates a Terrain message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof input.Terrain
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {input.Terrain} Terrain
+         */
+        Terrain.fromObject = function fromObject(object) {
+            if (object instanceof $root.input.Terrain)
+                return object;
+            let message = new $root.input.Terrain();
+            switch (object.type) {
+            default:
+                if (typeof object.type === "number") {
+                    message.type = object.type;
+                    break;
+                }
+                break;
+            case "TERRAIN_UNSPECIFIED":
+            case 0:
+                message.type = 0;
+                break;
+            case "ROCK":
+            case 1:
+                message.type = 1;
+                break;
+            }
+            switch (object.state) {
+            default:
+                if (typeof object.state === "number") {
+                    message.state = object.state;
+                    break;
+                }
+                break;
+            case "TERRAIN_STATE_UNSPECIFIED":
+            case 0:
+                message.state = 0;
+                break;
+            case "SOLID":
+            case 1:
+                message.state = 1;
+                break;
+            case "DAMAGED":
+            case 2:
+                message.state = 2;
+                break;
+            case "VULNERABLE":
+            case 3:
+                message.state = 3;
+                break;
+            case "DESTROYED":
+            case 4:
+                message.state = 4;
+                break;
+            }
+            if (object.position != null) {
+                if (typeof object.position !== "object")
+                    throw TypeError(".input.Terrain.position: object expected");
+                message.position = $root.input.Position.fromObject(object.position);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Terrain message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof input.Terrain
+         * @static
+         * @param {input.Terrain} message Terrain
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Terrain.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.type = options.enums === String ? "TERRAIN_UNSPECIFIED" : 0;
+                object.state = options.enums === String ? "TERRAIN_STATE_UNSPECIFIED" : 0;
+                object.position = null;
+            }
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = options.enums === String ? $root.input.TerrainType[message.type] === undefined ? message.type : $root.input.TerrainType[message.type] : message.type;
+            if (message.state != null && message.hasOwnProperty("state"))
+                object.state = options.enums === String ? $root.input.TerrainState[message.state] === undefined ? message.state : $root.input.TerrainState[message.state] : message.state;
+            if (message.position != null && message.hasOwnProperty("position"))
+                object.position = $root.input.Position.toObject(message.position, options);
+            return object;
+        };
+
+        /**
+         * Converts this Terrain to JSON.
+         * @function toJSON
+         * @memberof input.Terrain
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Terrain.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Terrain
+         * @function getTypeUrl
+         * @memberof input.Terrain
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Terrain.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/input.Terrain";
+        };
+
+        return Terrain;
+    })();
+
+    /**
+     * TerrainType enum.
+     * @name input.TerrainType
+     * @enum {number}
+     * @property {number} TERRAIN_UNSPECIFIED=0 TERRAIN_UNSPECIFIED value
+     * @property {number} ROCK=1 ROCK value
+     */
+    input.TerrainType = (function() {
+        const valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "TERRAIN_UNSPECIFIED"] = 0;
+        values[valuesById[1] = "ROCK"] = 1;
+        return values;
+    })();
+
+    /**
+     * TerrainState enum.
+     * @name input.TerrainState
+     * @enum {number}
+     * @property {number} TERRAIN_STATE_UNSPECIFIED=0 TERRAIN_STATE_UNSPECIFIED value
+     * @property {number} SOLID=1 SOLID value
+     * @property {number} DAMAGED=2 DAMAGED value
+     * @property {number} VULNERABLE=3 VULNERABLE value
+     * @property {number} DESTROYED=4 DESTROYED value
+     */
+    input.TerrainState = (function() {
+        const valuesById = {}, values = Object.create(valuesById);
+        values[valuesById[0] = "TERRAIN_STATE_UNSPECIFIED"] = 0;
+        values[valuesById[1] = "SOLID"] = 1;
+        values[valuesById[2] = "DAMAGED"] = 2;
+        values[valuesById[3] = "VULNERABLE"] = 3;
+        values[valuesById[4] = "DESTROYED"] = 4;
+        return values;
     })();
 
     return input;

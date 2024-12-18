@@ -2,16 +2,16 @@ import proto from "./proto";
 
 export type HitRange = [smallerX: number, largerX: number];
 
-export type Dimension = {
+export type Position = {
   x: number;
   y: number;
 };
 
 export type Character = {
   imageSet: CharacterImageSet;
-  dimension: Dimension;
-  goalDimension: Dimension;
-  imagePosition: Dimension;
+  position: Position;
+  goalPosition: Position;
+  imagePosition: Position;
   counter: number;
   rewind: boolean;
   isAttacking: boolean;
@@ -26,7 +26,7 @@ export type Attack = {
   userId: string;
   heading: "left" | "right";
   remainDistance: number;
-  dimension: Dimension;
+  position: Position;
   count: number;
 };
 

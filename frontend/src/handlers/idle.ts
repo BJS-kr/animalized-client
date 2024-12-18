@@ -16,13 +16,10 @@ export function handleIdleAnimation(
   }
 
   if (character.heading === "right") {
-    ctx.translate(character.dimension.x, character.dimension.y);
+    ctx.translate(character.position.x, character.position.y);
     ctx.scale(1, 1);
   } else if (character.heading === "left") {
-    ctx.translate(
-      character.dimension.x + CHARACTER_WIDTH,
-      character.dimension.y
-    );
+    ctx.translate(character.position.x + CHARACTER_WIDTH, character.position.y);
     ctx.scale(-1, 1);
   } else {
     throw new Error("invalid heading");

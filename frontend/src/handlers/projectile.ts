@@ -31,12 +31,14 @@ export function handleProjectile(
 
   attack.remainDistance -= PROJECTILE_SPEED;
 
-  stayInside(attack.dimension);
+  stayInside(attack.position);
   forwardProjectile(attack);
   drawProjectile(ctx, attack, projectileImage);
 
-  for (const character of characters) {
-    attack.userId === userId && handleCollision(attack, character);
+  for (let i = 0; i < characters.length; i++) {
+    if (attack.userId === userId) {
+      handleCollision(attack, characters[i]);
+    }
   }
   attack.count++;
 
@@ -45,9 +47,9 @@ export function handleProjectile(
 
 function forwardProjectile(attack: Attack) {
   if (attack.heading === "right") {
-    attack.dimension.x += PROJECTILE_SPEED;
+    attack.position.x += PROJECTILE_SPEED;
   } else {
-    attack.dimension.x -= PROJECTILE_SPEED;
+    attack.position.x -= PROJECTILE_SPEED;
   }
 }
 
@@ -58,10 +60,10 @@ function drawProjectile(
 ) {
   ctx.save();
   if (attack.heading === "right") {
-    ctx.translate(attack.dimension.x, attack.dimension.y);
+    ctx.translate(attack.position.x, attack.position.y);
     ctx.scale(1, 1);
   } else {
-    ctx.translate(attack.dimension.x + ATTACK_WIDTH, attack.dimension.y);
+    ctx.translate(attack.position.x + ATTACK_WIDTH, attack.position.y);
     ctx.scale(-1, 1);
   }
   ctx.drawImage(projectileImage, 20, 15, 30, 10);

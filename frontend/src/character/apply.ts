@@ -6,7 +6,8 @@ import type { Attack, Character, CharacterInputs } from "../types";
 export function applyNextInput(
   inputs: CharacterInputs,
   character: Character,
-  attacks: Attack[]
+  attacks: Attack[],
+  terrains: proto.ITerrain[]
 ) {
   if (!character.isProcessing) {
     const characterInput = inputs.get(character.userId)?.inputs.shift();
@@ -28,16 +29,20 @@ export function applyNextInput(
     if (characterInput.op.type === proto.Operation.OperationType.MOVE) {
       switch (characterInput.op.direction) {
         case proto.Operation.Direction.LEFT:
-          character.goalDimension.x -= CELL_SIZE;
+          character.goalPosition.x -= CELL_SIZE;
+
           break;
         case proto.Operation.Direction.RIGHT:
-          character.goalDimension.x += CELL_SIZE;
+          character.goalPosition.x += CELL_SIZE;
+
           break;
         case proto.Operation.Direction.UP:
-          character.goalDimension.y -= CELL_SIZE;
+          character.goalPosition.y -= CELL_SIZE;
+
           break;
         case proto.Operation.Direction.DOWN:
-          character.goalDimension.y += CELL_SIZE;
+          character.goalPosition.y += CELL_SIZE;
+
           break;
         default:
           throw new Error("unexpected move direction");
