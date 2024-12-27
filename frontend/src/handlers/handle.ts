@@ -11,11 +11,10 @@ import {
 import { handleCharacterNameText } from "./name";
 import { handleProjectiles } from "./projectile";
 import { handleVisibleRange } from "./vision";
-import type { Character, Attack, CharacterInputs, GameContext } from "../types";
+import type { Character, GameContext } from "../types";
 import { handleHitAnimation } from "./hit";
 import { drawBackground } from "./background";
 import { drawTerrains } from "./terrains";
-import proto from "../proto";
 
 export function handle(
   ctx: CanvasRenderingContext2D,
@@ -24,7 +23,9 @@ export function handle(
   projectileImage: HTMLImageElement,
   userId: string,
   userCharacter: Character | null,
-  background: HTMLImageElement
+  background: HTMLImageElement,
+  cancelRef: React.MutableRefObject<boolean>,
+  reqIdRef: React.MutableRefObject<number>
 ) {
   drawBackground(ctx, background);
   drawTerrains(ctx, gameContext.terrains);
@@ -73,7 +74,12 @@ export function handle(
 
   handleVisibleRange(ctx, userCharacter);
 
-  requestAnimationFrame(() =>
+  if (cancelRef.current) {
+    cancelRef.current = false;
+    return cancelAnimationFrame(reqIdRef.current);
+  }
+
+  reqIdRef.current = requestAnimationFrame(() =>
     handle(
       ctx,
       canvasSize,
@@ -81,7 +87,9 @@ export function handle(
       projectileImage,
       userId,
       userCharacter,
-      background
+      background,
+      cancelRef,
+      reqIdRef
     )
   );
 }

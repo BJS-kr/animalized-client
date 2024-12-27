@@ -1,7 +1,7 @@
 import { ATTACK_WIDTH, PROJECTILE_SPEED } from "../constansts";
 import { stayInside } from "../helper/stay";
 import proto from "../proto";
-import type { Attack, Character, GameContext, HitRange } from "../types";
+import type { Attack, GameContext } from "../types";
 import { handleCollision } from "./collide";
 
 export function handleProjectiles(
@@ -10,11 +10,17 @@ export function handleProjectiles(
   projectileImage: HTMLImageElement,
   userId: string
 ) {
-  for (const attack of gameContext.attacks) {
-    if (attack.remainDistance <= 0) {
+  for (let i = 0; i < gameContext.attacks.length; i++) {
+    if (gameContext.attacks[i].remainDistance <= 0) {
       continue;
     }
-    handleProjectile(ctx, gameContext, attack, projectileImage, userId);
+    handleProjectile(
+      ctx,
+      gameContext,
+      gameContext.attacks[i],
+      projectileImage,
+      userId
+    );
   }
 
   gameContext.attacks = gameContext.attacks.filter(

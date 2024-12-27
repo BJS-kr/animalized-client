@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CANVAS_SIZE, CELL_SIZE } from "./constansts";
-import type { Attack, Character, CharacterInputs, GameContext } from "./types";
+import { CANVAS_SIZE } from "./constansts";
+import type { GameContext } from "./types";
 import { handle } from "./handlers/handle";
-import { handleJoinRoom, Lobby } from "./lobby";
+import { Lobby } from "./lobby";
 import { Room } from "./room";
 import { EventsOn, EventsOff } from "../wailsjs/runtime/runtime";
 import { encode } from "./common/encode";
@@ -30,8 +30,10 @@ function App() {
   const [lobbyStatus, setLobbyStatus] = useState<proto.ILobby>();
   const [userId, setUserId] = useState("");
   const [winnerId, setWinnerId] = useState("");
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const cancelRef = useRef<boolean>(false);
+  const reqIdRef = useRef<number>(0);
   const fireball = makeFireball();
   const grass = new Image();
   grass.src = "/sprites/terrains/grass.png";
@@ -39,11 +41,7 @@ function App() {
   useEffect(() => {
     if (canvasRef.current) {
       ctxRef.current = canvasRef.current.getContext("2d");
-    }
-  });
 
-  useEffect(() => {
-    if (ctxRef.current && canvasRef.current) {
       handle(
         ctxRef.current!,
         CANVAS_SIZE,
@@ -51,7 +49,9 @@ function App() {
         fireball,
         userId,
         null,
-        grass
+        grass,
+        cancelRef,
+        reqIdRef
       );
     }
   }, [isInGame]);
@@ -82,8 +82,6 @@ function App() {
   EventsOff("input");
   EventsOn("input", (msg) => {
     const decodedInput = proto.Input.decode(toByteArray(msg));
-
-    console.dir(decodedInput, { depth: null });
 
     if (!decodedInput || !decodedInput.userId) return;
 
@@ -187,8 +185,7 @@ function App() {
           gameContext.characters.length = 0;
           gameContext.inputs.clear();
           gameContext.terrains.length = 0;
-
-          document.addEventListener("keydown", () => {});
+          cancelRef.current = true;
         }
         break;
       default:
