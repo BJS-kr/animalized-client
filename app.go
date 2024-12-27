@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net"
 
@@ -63,8 +62,6 @@ func (a *App) SendInput(msg string) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("send", decoded)
 
 	if len(decoded) > BUFFER_SIZE {
 		return errors.New("packet length must not exceed BUFFER_SIZE")
