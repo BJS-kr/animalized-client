@@ -79,7 +79,7 @@ func (a *App) SendInput(msg string) error {
 }
 
 func (a *App) OpenConnection(initInput *message.Input) error {
-	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:9988")
+	addr, err := net.ResolveTCPAddr("tcp", "52.79.44.199:9988")
 
 	if err != nil {
 		return err

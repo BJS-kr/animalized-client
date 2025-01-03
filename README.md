@@ -5,7 +5,15 @@
 # Introduction
 
 This is Animalized-client. Animalized is multi-player realtime battle simulation game.
-You can play this client with [animalized-server](https://github.com/BJS-kr/animalized-server)
+You can play this client with [animalized-server](https://github.com/BJS-kr/animalized-server). Also, **Animalized** project is highly focused on the server, not the client.
+So, if you have interests in this project, please visit [animalized-server](https://github.com/BJS-kr/animalized-server).
+
+# Build
+
+1. Install [Wails](https://wails.io/docs/gettingstarted/installation) with Wails dependencies
+2. Download repository
+3. Install JS dependencies
+4. Build using "wails build" command
 
 # Game Rules
 
@@ -23,5 +31,8 @@ You can play this client with [animalized-server](https://github.com/BJS-kr/anim
 
 ### Known issue
 
-After game played, keydown event still remains, so keydown intercepted by that event.
-You can still write the room name but have to type multiple times.
+1. After game played, keydown event still remains, so keydown intercepted by that event.
+   You can still write the room name but have to type multiple times.
+2. When build target is Windows, in-game screen does not shows up.
+
+I did not fixed these issues because this client is just for POC.
