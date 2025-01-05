@@ -188,6 +188,11 @@ function App() {
           cancelRef.current = true;
         }
         break;
+      case "error":
+        if (decodedInput.error!.userId === userId) {
+          alert(decodedInput.error!.message);
+        }
+        break;
       default:
         console.error("unhandled input kind", decodedInput.kind);
     }
