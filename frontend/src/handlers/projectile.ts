@@ -60,7 +60,7 @@ export function handleProjectile(
   for (let i = 1; i < gameContext.terrains.length; i++) {
     if (
       attack.userId === userId &&
-      gameContext.terrains[i].state !== proto.TerrainState.DESTROYED
+      gameContext.terrains[i].state !== proto.Terrain.TerrainState.DESTROYED
     ) {
       handleCollision(gameContext, attack, {
         ...gameContext.terrains[i],

@@ -33,6 +33,7 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const cancelRef = useRef<boolean>(false);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
   const reqIdRef = useRef<number>(0);
   const fireball = makeFireball();
   const grass = new Image();
@@ -142,7 +143,7 @@ function App() {
 
               document.addEventListener(
                 "keydown",
-                handleKeyDown(userCharacter, gameContext.terrains)
+                handleKeyDown(userCharacter, gameContext.terrains, autoPlayRef)
               );
             }
 
@@ -182,15 +183,16 @@ function App() {
           setWinnerId(decodedInput.gameResult!.winnerId ?? "");
           setIsInGame(false);
           setRoomName("");
+
+          if (autoPlayRef.current) {
+            clearInterval(autoPlayRef.current);
+            autoPlayRef.current = null;
+          }
+
           gameContext.characters.length = 0;
           gameContext.inputs.clear();
           gameContext.terrains.length = 0;
           cancelRef.current = true;
-        }
-        break;
-      case "error":
-        if (decodedInput.error!.userId === userId) {
-          alert(decodedInput.error!.message);
         }
         break;
       default:

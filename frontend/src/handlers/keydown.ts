@@ -7,6 +7,7 @@ import { input as proto } from "../proto/compiled";
 import type { Character, Position } from "../types";
 
 let lastKeyDown = Date.now();
+const opKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "a"];
 
 function isBlocked(
   goalPosition: Position,
@@ -36,7 +37,7 @@ function isBlocked(
     if (
       !terrain ||
       !terrain.position ||
-      terrain.state === proto.TerrainState.DESTROYED
+      terrain.state === proto.Terrain.TerrainState.DESTROYED
     )
       return false;
     return terrain.position!.x === pos.x && terrain.position!.y === pos.y;
@@ -44,8 +45,30 @@ function isBlocked(
 }
 
 export const handleKeyDown =
-  (character: Character, terrains: proto.ITerrain[]) =>
+  (
+    character: Character,
+    terrains: proto.ITerrain[],
+    autoPlayRef: React.MutableRefObject<NodeJS.Timeout | null>
+  ) =>
   async (event: KeyboardEvent) => {
+    // auto play
+    if (event.key === "p" || event.key === "P") {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+        autoPlayRef.current = null;
+      } else {
+        autoPlayRef.current = setInterval(() => {
+          document.dispatchEvent(
+            new KeyboardEvent("keydown", {
+              key: opKeys[Math.floor(Math.random() * opKeys.length)],
+            })
+          );
+        }, 500);
+      }
+
+      return;
+    }
+
     if (Date.now() - lastKeyDown < 100) {
       return;
     }

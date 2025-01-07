@@ -55,7 +55,7 @@ export function drawTerrains(
     if (
       !terrain.state ||
       !terrain.position ||
-      terrain.state === proto.TerrainState.DESTROYED
+      terrain.state === proto.Terrain.TerrainState.DESTROYED
     )
       continue;
 

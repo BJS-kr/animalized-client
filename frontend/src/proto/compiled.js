@@ -28,7 +28,6 @@ export const input = $root.input = (() => {
          * @property {input.ILobby|null} [lobby] Input lobby
          * @property {input.IRoom|null} [room] Input room
          * @property {input.IGameResult|null} [gameResult] Input gameResult
-         * @property {input.IError|null} [error] Input error
          */
 
         /**
@@ -94,25 +93,17 @@ export const input = $root.input = (() => {
          */
         Input.prototype.gameResult = null;
 
-        /**
-         * Input error.
-         * @member {input.IError|null|undefined} error
-         * @memberof input.Input
-         * @instance
-         */
-        Input.prototype.error = null;
-
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
 
         /**
          * Input kind.
-         * @member {"init"|"op"|"lobby"|"room"|"gameResult"|"error"|undefined} kind
+         * @member {"init"|"op"|"lobby"|"room"|"gameResult"|undefined} kind
          * @memberof input.Input
          * @instance
          */
         Object.defineProperty(Input.prototype, "kind", {
-            get: $util.oneOfGetter($oneOfFields = ["init", "op", "lobby", "room", "gameResult", "error"]),
+            get: $util.oneOfGetter($oneOfFields = ["init", "op", "lobby", "room", "gameResult"]),
             set: $util.oneOfSetter($oneOfFields)
         });
 
@@ -152,8 +143,6 @@ export const input = $root.input = (() => {
                 $root.input.Room.encode(message.room, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
             if (message.gameResult != null && Object.hasOwnProperty.call(message, "gameResult"))
                 $root.input.GameResult.encode(message.gameResult, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-            if (message.error != null && Object.hasOwnProperty.call(message, "error"))
-                $root.input.Error.encode(message.error, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
             return writer;
         };
 
@@ -210,10 +199,6 @@ export const input = $root.input = (() => {
                     }
                 case 6: {
                         message.gameResult = $root.input.GameResult.decode(reader, reader.uint32());
-                        break;
-                    }
-                case 7: {
-                        message.error = $root.input.Error.decode(reader, reader.uint32());
                         break;
                     }
                 default:
@@ -303,16 +288,6 @@ export const input = $root.input = (() => {
                         return "gameResult." + error;
                 }
             }
-            if (message.error != null && message.hasOwnProperty("error")) {
-                if (properties.kind === 1)
-                    return "kind: multiple values";
-                properties.kind = 1;
-                {
-                    let error = $root.input.Error.verify(message.error);
-                    if (error)
-                        return "error." + error;
-                }
-            }
             return null;
         };
 
@@ -354,11 +329,6 @@ export const input = $root.input = (() => {
                 if (typeof object.gameResult !== "object")
                     throw TypeError(".input.Input.gameResult: object expected");
                 message.gameResult = $root.input.GameResult.fromObject(object.gameResult);
-            }
-            if (object.error != null) {
-                if (typeof object.error !== "object")
-                    throw TypeError(".input.Input.error: object expected");
-                message.error = $root.input.Error.fromObject(object.error);
             }
             return message;
         };
@@ -404,11 +374,6 @@ export const input = $root.input = (() => {
                 object.gameResult = $root.input.GameResult.toObject(message.gameResult, options);
                 if (options.oneofs)
                     object.kind = "gameResult";
-            }
-            if (message.error != null && message.hasOwnProperty("error")) {
-                object.error = $root.input.Error.toObject(message.error, options);
-                if (options.oneofs)
-                    object.kind = "error";
             }
             return object;
         };
@@ -3771,256 +3736,6 @@ export const input = $root.input = (() => {
         })();
 
         return Terrain;
-    })();
-
-    input.Error = (function() {
-
-        /**
-         * Properties of an Error.
-         * @memberof input
-         * @interface IError
-         * @property {string|null} [code] Error code
-         * @property {string|null} [message] Error message
-         * @property {string|null} [userId] Error userId
-         */
-
-        /**
-         * Constructs a new Error.
-         * @memberof input
-         * @classdesc Represents an Error.
-         * @implements IError
-         * @constructor
-         * @param {input.IError=} [properties] Properties to set
-         */
-        function Error(properties) {
-            if (properties)
-                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * Error code.
-         * @member {string} code
-         * @memberof input.Error
-         * @instance
-         */
-        Error.prototype.code = "";
-
-        /**
-         * Error message.
-         * @member {string} message
-         * @memberof input.Error
-         * @instance
-         */
-        Error.prototype.message = "";
-
-        /**
-         * Error userId.
-         * @member {string} userId
-         * @memberof input.Error
-         * @instance
-         */
-        Error.prototype.userId = "";
-
-        /**
-         * Creates a new Error instance using the specified properties.
-         * @function create
-         * @memberof input.Error
-         * @static
-         * @param {input.IError=} [properties] Properties to set
-         * @returns {input.Error} Error instance
-         */
-        Error.create = function create(properties) {
-            return new Error(properties);
-        };
-
-        /**
-         * Encodes the specified Error message. Does not implicitly {@link input.Error.verify|verify} messages.
-         * @function encode
-         * @memberof input.Error
-         * @static
-         * @param {input.IError} message Error message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        Error.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.code != null && Object.hasOwnProperty.call(message, "code"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.code);
-            if (message.message != null && Object.hasOwnProperty.call(message, "message"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
-            if (message.userId != null && Object.hasOwnProperty.call(message, "userId"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.userId);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified Error message, length delimited. Does not implicitly {@link input.Error.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof input.Error
-         * @static
-         * @param {input.IError} message Error message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        Error.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes an Error message from the specified reader or buffer.
-         * @function decode
-         * @memberof input.Error
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {input.Error} Error
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        Error.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.input.Error();
-            while (reader.pos < end) {
-                let tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1: {
-                        message.code = reader.string();
-                        break;
-                    }
-                case 2: {
-                        message.message = reader.string();
-                        break;
-                    }
-                case 3: {
-                        message.userId = reader.string();
-                        break;
-                    }
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes an Error message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof input.Error
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {input.Error} Error
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        Error.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies an Error message.
-         * @function verify
-         * @memberof input.Error
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        Error.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.code != null && message.hasOwnProperty("code"))
-                if (!$util.isString(message.code))
-                    return "code: string expected";
-            if (message.message != null && message.hasOwnProperty("message"))
-                if (!$util.isString(message.message))
-                    return "message: string expected";
-            if (message.userId != null && message.hasOwnProperty("userId"))
-                if (!$util.isString(message.userId))
-                    return "userId: string expected";
-            return null;
-        };
-
-        /**
-         * Creates an Error message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof input.Error
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {input.Error} Error
-         */
-        Error.fromObject = function fromObject(object) {
-            if (object instanceof $root.input.Error)
-                return object;
-            let message = new $root.input.Error();
-            if (object.code != null)
-                message.code = String(object.code);
-            if (object.message != null)
-                message.message = String(object.message);
-            if (object.userId != null)
-                message.userId = String(object.userId);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from an Error message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof input.Error
-         * @static
-         * @param {input.Error} message Error
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        Error.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            let object = {};
-            if (options.defaults) {
-                object.code = "";
-                object.message = "";
-                object.userId = "";
-            }
-            if (message.code != null && message.hasOwnProperty("code"))
-                object.code = message.code;
-            if (message.message != null && message.hasOwnProperty("message"))
-                object.message = message.message;
-            if (message.userId != null && message.hasOwnProperty("userId"))
-                object.userId = message.userId;
-            return object;
-        };
-
-        /**
-         * Converts this Error to JSON.
-         * @function toJSON
-         * @memberof input.Error
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        Error.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        /**
-         * Gets the default type url for Error
-         * @function getTypeUrl
-         * @memberof input.Error
-         * @static
-         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-         * @returns {string} The default type url
-         */
-        Error.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/input.Error";
-        };
-
-        return Error;
     })();
 
     return input;

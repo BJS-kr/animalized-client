@@ -5,7 +5,7 @@
 # Introduction
 
 This is Animalized-client. Animalized is multi-player realtime battle simulation game.
-You can play this client with [animalized-server](https://github.com/BJS-kr/animalized-server). Also, **Animalized** project is highly focused on the server, not the client.
+You can play this client with [animalized-server](https://github.com/BJS-kr/animalized-server). Also, **Animalized** project is mainly focused on the server.
 So, if you have interests in this project, please visit [animalized-server](https://github.com/BJS-kr/animalized-server).
 
 # Build

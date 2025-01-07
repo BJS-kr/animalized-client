@@ -67,18 +67,18 @@ export function applyNextInput(gameContext: GameContext, character: Character) {
           return;
         }
 
-        if (targetTerrain.type === proto.TerrainType.ROCK) {
+        if (targetTerrain.type === proto.Terrain.TerrainType.ROCK) {
           switch (targetTerrain.state) {
-            case proto.TerrainState.SOLID:
-              targetTerrain.state = proto.TerrainState.DAMAGED;
+            case proto.Terrain.TerrainState.SOLID:
+              targetTerrain.state = proto.Terrain.TerrainState.DAMAGED;
               break;
-            case proto.TerrainState.DAMAGED:
-              targetTerrain.state = proto.TerrainState.VULNERABLE;
+            case proto.Terrain.TerrainState.DAMAGED:
+              targetTerrain.state = proto.Terrain.TerrainState.VULNERABLE;
               break;
-            case proto.TerrainState.VULNERABLE:
-              targetTerrain.state = proto.TerrainState.DESTROYED;
+            case proto.Terrain.TerrainState.VULNERABLE:
+              targetTerrain.state = proto.Terrain.TerrainState.DESTROYED;
               break;
-            case proto.TerrainState.DESTROYED:
+            case proto.Terrain.TerrainState.DESTROYED:
               break;
             default:
               console.warn("unexpected terrain state");
