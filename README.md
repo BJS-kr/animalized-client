@@ -1,5 +1,7 @@
 <p align="center">
   <img src="animalized.png" />
+    <br >
+  <img src="play.gif">
 </p>
 
 # Introduction
