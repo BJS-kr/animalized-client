@@ -87,8 +87,6 @@ export function applyNextInput(gameContext: GameContext, character: Character) {
       } else {
         character.isHit = true;
       }
-
-      gameContext.hitMap.delete(characterInput.op.projectileId!);
     }
   }
 }

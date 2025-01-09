@@ -24,7 +24,6 @@ export async function handleCollision(
     collidable.position!.x! >= hitRange[0] &&
     collidable.position!.x! <= hitRange[1]
   ) {
-    gameContext.hitMap.set(attack.id, true);
     const input = new proto.Input();
     const operation = new proto.Operation();
     input.userId = attack.userId;

@@ -35,10 +35,6 @@ export function handleProjectile(
   projectileImage: HTMLImageElement,
   userId: string
 ) {
-  if (gameContext.hitMap.get(attack.id)) {
-    return;
-  }
-
   ctx.save();
 
   attack.remainDistance -= PROJECTILE_SPEED;
@@ -51,10 +47,6 @@ export function handleProjectile(
     if (attack.userId === userId) {
       handleCollision(gameContext, attack, gameContext.characters[i]);
     }
-
-    if (gameContext.hitMap.get(attack.id)) {
-      return;
-    }
   }
 
   for (let i = 1; i < gameContext.terrains.length; i++) {
@@ -66,10 +58,6 @@ export function handleProjectile(
         ...gameContext.terrains[i],
         id: i,
       });
-    }
-
-    if (gameContext.hitMap.get(attack.id)) {
-      return;
     }
   }
   attack.count++;

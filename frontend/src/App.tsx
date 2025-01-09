@@ -17,7 +17,6 @@ export const gameContext: GameContext = {
   terrains: [],
   characters: [],
   inputs: new Map(),
-  hitMap: new Map(),
   attacks: [],
 };
 
